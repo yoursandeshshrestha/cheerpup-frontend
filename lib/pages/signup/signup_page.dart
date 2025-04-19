@@ -164,7 +164,57 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                               vertical: 15,
                             ),
                             border: InputBorder.none,
-                            hintText: 'Enter your password...',
+                            hintText: 'Enter your password',
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            prefixIcon: const Icon(
+                              Icons.lock_outline,
+                              color: Color(0xFF4A3728),
+                            ),
+                            suffixIcon: IconButton(
+                              icon: const Icon(
+                                Icons.visibility_outlined,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                // password visibility toggle (optional)
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      const Text(
+                        'Confirm password',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF4A3728),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                            color: const Color(0xFFA9BC7D),
+                            width: 1,
+                          ),
+                        ),
+                        child: TextField(
+                          controller: _passwordController,
+                          focusNode: _focusNode2,
+                          obscureText: true,
+                          onTapOutside: (_) => _focusNode2.unfocus(),
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 15,
+                            ),
+                            border: InputBorder.none,
+                            hintText: 'Confirm your password',
                             hintStyle: const TextStyle(color: Colors.grey),
                             prefixIcon: const Icon(
                               Icons.lock_outline,
@@ -214,7 +264,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      'Sign In',
+                                      'Sign up',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 18,
@@ -277,7 +327,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         context.replaceNamed('login');
                       },
                       child: const Text(
-                        'Sign In.',
+                        'Sign in',
                         style: TextStyle(
                           color: Color(0xFFFF9500),
                           fontSize: 14,
