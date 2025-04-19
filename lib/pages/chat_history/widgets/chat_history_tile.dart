@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/chat_detail_screen.dart';
 
 class ChatHistoryTile extends StatelessWidget {
-  final ChatMessage message;
+  final ChatHistoryModel message;
 
   const ChatHistoryTile({super.key, required this.message});
 
@@ -62,7 +62,7 @@ class ChatHistoryTile extends StatelessWidget {
                       // Title and timestamp in separate rows to prevent overflow
                       Flexible(
                         child: Text(
-                          message.fullResponse ?? 'Chat ${message.id.substring(0, 4)}',
+                          message.systemMessage,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                           maxLines: 1,
@@ -70,19 +70,18 @@ class ChatHistoryTile extends StatelessWidget {
                         ),
                       ),
 
-                      if (message.timestamp != null)
-                        Text(
-                          _formatTimestamp(message.timestamp!),
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.copyWith(color: Colors.grey),
-                        ),
-
+                      // if (message.timestamp != null)
+                      //   Text(
+                      //     _formatTimestamp(message.timestamp!),
+                      //     style: Theme.of(
+                      //       context,
+                      //     ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                      //   ),
                       const SizedBox(height: 4),
 
                       // Message preview text
                       Text(
-                        message.preview,
+                        message.userMessage,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(
@@ -111,9 +110,7 @@ class ChatHistoryTile extends StatelessWidget {
             minChildSize: 0.5,
             maxChildSize: 0.95,
             builder: (_, scrollController) {
-              return ChatDetailScreen(
-                chatId: chatId,
-              );
+              return ChatDetailScreen(chatId: chatId);
             },
           ),
     );
