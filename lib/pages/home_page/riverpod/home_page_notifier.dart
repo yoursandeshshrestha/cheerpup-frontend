@@ -1,55 +1,36 @@
-import 'package:cheerpup/commons/entities/user.dart';
+// lib/pages/home_page/riverpod/home_page_notifier.dart
+
+import 'package:cheerpup/commons/models/user_model.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_state.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomePageNotifier extends StateNotifier<HomeState> {
-  HomePageNotifier()
-    : super(
-        HomeState(
-          currentUser: User(
-            isSubscribed: true,
-            mood: 'Happy',
-            moodEmoji: const Icon(
-              Icons.sentiment_satisfied_alt,
-              color: Colors.white,
-              size: 14,
-            ),
-            progressPercentage: 80.0,
-            profileImageUrl:
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkAJEkJQ1WumU0hXNpXdgBt9NUKc0QDVIiaw&s",
-            fullName: "Sourav Das",
-            email: "elementary221b@gmail.com",
-            password: "password123",
-            accountType: "Patient",
-            weight: 65.0,
-            gender: "Trans Female",
-            location: "Tokyo, Japan",
-          ),
-          suggestedActivities: [],
-          suggestedExercises: [],
-        ),
-      );
+  HomePageNotifier() : super(HomeState());
 
-  // Add a method to update user profile
+  // Initialize user data from login response
+  void initializeUserData(Map<String, dynamic> userData) {
+    try {
+      // Convert the JSON data to UserModel
+      final userModel = UserModel.fromJson(userData);
+
+      state = state.copyWith(currentUser: userModel);
+
+      print('User data initialized successfully: ${userModel.name}');
+    } catch (e) {
+      print('Error initializing user data: $e');
+      // You might want to set a fallback user or show an error message
+    }
+  }
+
+  // Update user profile
   void updateUserProfile({
-    String? fullName,
+    String? name,
     String? email,
-    String? password,
-    String? accountType,
     double? weight,
     String? gender,
     String? location,
   }) {
-    final updatedUser = state.currentUser?.copyWith(
-      fullName: fullName,
-      email: email,
-      password: password,
-      accountType: accountType,
-      weight: weight,
-      gender: gender,
-      location: location,
-    );
+    final updatedUser = state.currentUser?.copyWith(name: name, email: email);
 
     state = state.copyWith(currentUser: updatedUser);
   }

@@ -1,4 +1,5 @@
-import 'package:cheerpup/pages/login/riverpod/signin_state.dart';
+import 'package:cheerpup/pages/signup/riverpod/signup_provider.dart';
+import 'package:cheerpup/pages/signup/riverpod/signup_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,44 +12,104 @@ class SignupPage extends ConsumerStatefulWidget {
 }
 
 class _SignupPageState extends ConsumerState<SignupPage> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _focusNode1 = FocusNode();
-  final _focusNode2 = FocusNode();
+  final _confirmPasswordController = TextEditingController();
+
+  final _nameFocusNode = FocusNode();
+  final _emailFocusNode = FocusNode();
+  final _phoneFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  final _confirmPasswordFocusNode = FocusNode();
+
+  bool _passwordsMatch = true;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
-    _focusNode1.dispose();
-    _focusNode2.dispose();
+    _confirmPasswordController.dispose();
+
+    _nameFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _phoneFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
+
     super.dispose();
   }
 
-  void _handleSignIn() {
+  void _handleSignUp() {
     // Unfocus any active text fields
-    _focusNode1.unfocus();
-    _focusNode2.unfocus();
+    _unfocusAll();
 
+    // Validate inputs
+    if (!_validateInputs()) {
+      return;
+    }
+
+    final name = _nameController.text.trim();
     final email = _emailController.text.trim();
+    final phoneNumber = _phoneController.text.trim();
     final password = _passwordController.text;
-    context.goNamed("home");
-    // ref.read(signInProvider.notifier).signIn(email, password);
+
+    // Call signup method from the provider
+    ref
+        .read(signupProvider.notifier)
+        .signup(
+          name: name,
+          email: email,
+          phoneNumber: phoneNumber,
+          password: password,
+        );
+  }
+
+  bool _validateInputs() {
+    // Check if passwords match
+    if (_passwordController.text != _confirmPasswordController.text) {
+      setState(() {
+        _passwordsMatch = false;
+      });
+      return false;
+    }
+
+    setState(() {
+      _passwordsMatch = true;
+    });
+
+    // Add more validation as needed
+    return true;
+  }
+
+  void _unfocusAll() {
+    _nameFocusNode.unfocus();
+    _emailFocusNode.unfocus();
+    _phoneFocusNode.unfocus();
+    _passwordFocusNode.unfocus();
+    _confirmPasswordFocusNode.unfocus();
   }
 
   @override
   Widget build(BuildContext context) {
-    final signInState = ref.watch(signInProvider);
+    final signupState = ref.watch(signupProvider);
+
+    // If signup was successful and we have a token, navigate to home
+    if (signupState.token != null && !signupState.isLoading) {
+      // Use addPostFrameCallback to avoid build-during-build errors
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.goNamed("home");
+      });
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
-        onTap: () {
-          // Unfocus active text fields when tapping outside
-          _focusNode1.unfocus();
-          _focusNode2.unfocus();
-        },
+        onTap: _unfocusAll,
         child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
@@ -90,14 +151,56 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 ),
                 const SizedBox(height: 40),
 
-                // --- Email ---
+                // --- Form fields ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Name field
                       const Text(
-                        'Email/Phone',
+                        'Full Name',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF4A3728),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                            color: const Color(0xFFA9BC7D),
+                            width: 1,
+                          ),
+                        ),
+                        child: TextField(
+                          controller: _nameController,
+                          focusNode: _nameFocusNode,
+                          onTapOutside: (_) => _nameFocusNode.unfocus(),
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 15,
+                            ),
+                            border: InputBorder.none,
+                            hintText: 'Enter your full name',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            prefixIcon: Icon(
+                              Icons.person_outline,
+                              color: Color(0xFF4A3728),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Email field
+                      const Text(
+                        'Email',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -116,15 +219,16 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         ),
                         child: TextField(
                           controller: _emailController,
-                          focusNode: _focusNode1,
-                          onTapOutside: (_) => _focusNode1.unfocus(),
+                          focusNode: _emailFocusNode,
+                          keyboardType: TextInputType.emailAddress,
+                          onTapOutside: (_) => _emailFocusNode.unfocus(),
                           decoration: const InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
                               horizontal: 20,
                               vertical: 15,
                             ),
                             border: InputBorder.none,
-                            hintText: 'Enter your email/Phone...',
+                            hintText: 'Enter your email',
                             hintStyle: TextStyle(color: Colors.grey),
                             prefixIcon: Icon(
                               Icons.email_outlined,
@@ -136,6 +240,49 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
                       const SizedBox(height: 20),
 
+                      // Phone field
+                      const Text(
+                        'Phone Number',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF4A3728),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                            color: const Color(0xFFA9BC7D),
+                            width: 1,
+                          ),
+                        ),
+                        child: TextField(
+                          controller: _phoneController,
+                          focusNode: _phoneFocusNode,
+                          keyboardType: TextInputType.phone,
+                          onTapOutside: (_) => _phoneFocusNode.unfocus(),
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 15,
+                            ),
+                            border: InputBorder.none,
+                            hintText: 'Enter your phone number',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            prefixIcon: Icon(
+                              Icons.phone_outlined,
+                              color: Color(0xFF4A3728),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Password field
                       const Text(
                         'Password',
                         style: TextStyle(
@@ -156,9 +303,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         ),
                         child: TextField(
                           controller: _passwordController,
-                          focusNode: _focusNode2,
+                          focusNode: _passwordFocusNode,
                           obscureText: true,
-                          onTapOutside: (_) => _focusNode2.unfocus(),
+                          onTapOutside: (_) => _passwordFocusNode.unfocus(),
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 20,
@@ -186,6 +333,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
                       const SizedBox(height: 20),
 
+                      // Confirm password
                       const Text(
                         'Confirm password',
                         style: TextStyle(
@@ -200,15 +348,19 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(50),
                           border: Border.all(
-                            color: const Color(0xFFA9BC7D),
+                            color:
+                                _passwordsMatch
+                                    ? const Color(0xFFA9BC7D)
+                                    : Colors.red,
                             width: 1,
                           ),
                         ),
                         child: TextField(
-                          controller: _passwordController,
-                          focusNode: _focusNode2,
+                          controller: _confirmPasswordController,
+                          focusNode: _confirmPasswordFocusNode,
                           obscureText: true,
-                          onTapOutside: (_) => _focusNode2.unfocus(),
+                          onTapOutside:
+                              (_) => _confirmPasswordFocusNode.unfocus(),
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 20,
@@ -233,30 +385,38 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                           ),
                         ),
                       ),
+                      if (!_passwordsMatch)
+                        const Padding(
+                          padding: EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Passwords do not match',
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                        ),
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 30),
 
-                // --- Sign In Button ---
+                // --- Sign Up Button ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: InkWell(
-                    onTap: signInState.isLoading ? null : _handleSignIn,
+                    onTap: signupState.isLoading ? null : _handleSignUp,
                     child: Container(
                       width: double.infinity,
                       height: 55,
                       decoration: BoxDecoration(
                         color:
-                            signInState.isLoading
+                            signupState.isLoading
                                 ? Colors.grey
                                 : const Color(0xFF4A3728),
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Center(
                         child:
-                            signInState.isLoading
+                            signupState.isLoading
                                 ? const CircularProgressIndicator(
                                   color: Colors.white,
                                 )
@@ -286,36 +446,19 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
                 const SizedBox(height: 20),
 
-                if (signInState.error != null)
+                // --- Error message ---
+                if (signupState.error != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Text(
-                      signInState.error!,
+                      signupState.error!,
                       style: const TextStyle(color: Colors.red),
                     ),
                   ),
 
                 const SizedBox(height: 30),
 
-                // // --- Social Login ---
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: [
-                //     _socialLoginButton(Icons.facebook, const Color(0xFF4A3728)),
-                //     const SizedBox(width: 20),
-                //     _socialLoginButton(
-                //       Icons.g_mobiledata,
-                //       const Color(0xFF4A3728),
-                //     ),
-                //     const SizedBox(width: 20),
-                //     _socialLoginButton(
-                //       Icons.camera_alt_outlined,
-                //       const Color(0xFF4A3728),
-                //     ),
-                //   ],
-                // ),
-                const SizedBox(height: 30),
-
+                // --- Already have an account ---
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -345,18 +488,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _socialLoginButton(IconData icon, Color color) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.grey.shade300, width: 1),
-      ),
-      child: Icon(icon, color: color),
     );
   }
 }

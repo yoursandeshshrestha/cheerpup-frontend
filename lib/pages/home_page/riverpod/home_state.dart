@@ -1,4 +1,4 @@
-import 'package:cheerpup/commons/entities/user.dart';
+import 'package:cheerpup/commons/models/user_model.dart';
 
 class Message {
   final String text;
@@ -15,7 +15,7 @@ class Message {
 }
 
 class HomeState {
-  final User? currentUser;
+  final UserModel? currentUser;
   final List<Message> messages;
   final bool isLoading;
   final List<String> suggestedActivities;
@@ -33,7 +33,7 @@ class HomeState {
 
   // Create a copy of the current state with updated values
   HomeState copyWith({
-    User? currentUser,
+    UserModel? currentUser,
     List<Message>? messages,
     bool? isLoading,
     List<String>? suggestedActivities,

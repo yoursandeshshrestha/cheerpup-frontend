@@ -16,6 +16,13 @@ class ProfileWeightSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final actualValue =
+        value > max
+            ? max
+            : value < min
+            ? min
+            : value;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -45,7 +52,7 @@ class ProfileWeightSlider extends StatelessWidget {
                 ),
               ),
               child: Slider(
-                value: value,
+                value: actualValue,
                 min: min,
                 max: max,
                 onChanged: onChanged,
@@ -61,7 +68,7 @@ class ProfileWeightSlider extends StatelessWidget {
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                   ),
                   Text(
-                    "${value.toInt()}kg",
+                    "${actualValue.toInt()}kg",
                     style: const TextStyle(
                       color: Color(0xFF8DAF5D),
                       fontSize: 14,

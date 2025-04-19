@@ -1,4 +1,6 @@
-import 'package:cheerpup/pages/login/riverpod/signin_state.dart';
+// lib/pages/login/login_page.dart
+
+import 'package:cheerpup/pages/login/riverpod/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,35 +13,60 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
-  final _emailController = TextEditingController();
+  final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _focusNode1 = FocusNode();
-  final _focusNode2 = FocusNode();
+  final _identifierFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+
+  bool _isEmail =
+      true; // Flag to determine if input is email or phone (for UI only)
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _identifierController.dispose();
     _passwordController.dispose();
-    _focusNode1.dispose();
-    _focusNode2.dispose();
+    _identifierFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
-  void _handleSignIn() {
+  void _handleLogin() {
     // Unfocus any active text fields
-    _focusNode1.unfocus();
-    _focusNode2.unfocus();
+    _identifierFocusNode.unfocus();
+    _passwordFocusNode.unfocus();
 
-    final email = _emailController.text.trim();
+    final identifier = _identifierController.text.trim();
     final password = _passwordController.text;
-    context.goNamed("home");
 
-    // ref.read(signInProvider.notifier).signIn(email, password, context);
+    // Validate inputs
+    if (identifier.isEmpty || password.isEmpty) {
+      // Show validation error
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter both email/phone and password'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Call login method from the provider
+    ref
+        .read(loginProvider.notifier)
+        .login(identifier: identifier, password: password);
   }
 
   @override
   Widget build(BuildContext context) {
-    final signInState = ref.watch(signInProvider);
+    final loginState = ref.watch(loginProvider);
+
+    // If login was successful and we have a token, navigate to home
+    if (loginState.token != null && !loginState.isLoading) {
+      // Use addPostFrameCallback to avoid build-during-build errors
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.goNamed("home");
+      });
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -47,8 +74,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       body: GestureDetector(
         onTap: () {
           // Unfocus active text fields when tapping outside
-          _focusNode1.unfocus();
-          _focusNode2.unfocus();
+          _identifierFocusNode.unfocus();
+          _passwordFocusNode.unfocus();
         },
         child: SafeArea(
           child: SingleChildScrollView(
@@ -91,7 +118,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
                 const SizedBox(height: 40),
 
-                // --- Email ---
+                // --- Email/Phone ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Column(
@@ -116,16 +143,27 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           ),
                         ),
                         child: TextField(
-                          controller: _emailController,
-                          focusNode: _focusNode1,
-                          onTapOutside: (_) => _focusNode1.unfocus(),
+                          controller: _identifierController,
+                          focusNode: _identifierFocusNode,
+                          keyboardType:
+                              _isEmail
+                                  ? TextInputType.emailAddress
+                                  : TextInputType.phone,
+                          onTapOutside: (_) => _identifierFocusNode.unfocus(),
+                          onChanged: (value) {
+                            // Detect if user is typing an email or phone number
+                            // This is only used to set the appropriate keyboard type
+                            setState(() {
+                              _isEmail = value.contains('@');
+                            });
+                          },
                           decoration: const InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
                               horizontal: 20,
                               vertical: 15,
                             ),
                             border: InputBorder.none,
-                            hintText: 'Enter your email/Phone...',
+                            hintText: 'Enter your email or phone number',
                             hintStyle: TextStyle(color: Colors.grey),
                             prefixIcon: Icon(
                               Icons.email_outlined,
@@ -157,16 +195,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                         child: TextField(
                           controller: _passwordController,
-                          focusNode: _focusNode2,
+                          focusNode: _passwordFocusNode,
                           obscureText: true,
-                          onTapOutside: (_) => _focusNode2.unfocus(),
+                          onTapOutside: (_) => _passwordFocusNode.unfocus(),
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 20,
                               vertical: 15,
                             ),
                             border: InputBorder.none,
-                            hintText: 'Enter your password...',
+                            hintText: 'Enter your password',
                             hintStyle: const TextStyle(color: Colors.grey),
                             prefixIcon: const Icon(
                               Icons.lock_outline,
@@ -194,20 +232,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: InkWell(
-                    onTap: signInState.isLoading ? null : _handleSignIn,
+                    onTap: loginState.isLoading ? null : _handleLogin,
                     child: Container(
                       width: double.infinity,
                       height: 55,
                       decoration: BoxDecoration(
                         color:
-                            signInState.isLoading
+                            loginState.isLoading
                                 ? Colors.grey
                                 : const Color(0xFF4A3728),
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Center(
                         child:
-                            signInState.isLoading
+                            loginState.isLoading
                                 ? const CircularProgressIndicator(
                                   color: Colors.white,
                                 )
@@ -237,36 +275,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                 const SizedBox(height: 20),
 
-                if (signInState.error != null)
+                // Error message
+                if (loginState.error != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Text(
-                      signInState.error!,
+                      loginState.error!,
                       style: const TextStyle(color: Colors.red),
                     ),
                   ),
 
                 const SizedBox(height: 30),
 
-                // // --- Social Login ---
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: [
-                //     _socialLoginButton(Icons.facebook, const Color(0xFF4A3728)),
-                //     const SizedBox(width: 20),
-                //     _socialLoginButton(
-                //       Icons.g_mobiledata,
-                //       const Color(0xFF4A3728),
-                //     ),
-                //     const SizedBox(width: 20),
-                //     _socialLoginButton(
-                //       Icons.camera_alt_outlined,
-                //       const Color(0xFF4A3728),
-                //     ),
-                //   ],
-                // ),
-                const SizedBox(height: 30),
-
+                // --- Sign Up Link ---
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -279,7 +300,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         context.replaceNamed('signup');
                       },
                       child: const Text(
-                        'Sign Up.',
+                        'Sign Up',
                         style: TextStyle(
                           color: Color(0xFFFF9500),
                           fontSize: 14,
@@ -296,18 +317,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _socialLoginButton(IconData icon, Color color) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.grey.shade300, width: 1),
-      ),
-      child: Icon(icon, color: color),
     );
   }
 }

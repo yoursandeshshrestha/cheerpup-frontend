@@ -4,10 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'widgets/profile_button.dart';
-import 'widgets/profile_dropdown_field.dart';
 import 'widgets/profile_field.dart';
 import 'widgets/profile_header.dart';
-import 'widgets/profile_password_field.dart';
 import 'widgets/profile_weight_slider.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
@@ -18,29 +16,19 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-  // Controllers for the text fields
   late TextEditingController _nameController;
   late TextEditingController _emailController;
-  late TextEditingController _passwordController;
 
-  // State variables
-  late String _selectedAccountType;
   late double _weightValue;
-  late String _selectedGender;
-  late String _selectedLocation;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize with empty values, they will be updated in didChangeDependencies
     _nameController = TextEditingController();
     _emailController = TextEditingController();
-    _passwordController = TextEditingController();
-    _selectedAccountType = "Patient";
-    _weightValue = 65.0;
-    _selectedGender = "Trans Female";
-    _selectedLocation = "Tokyo, Japan";
+
+    _weightValue = 0.0;
   }
 
   @override
@@ -53,17 +41,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     if (user != null) {
       // Update controllers with user data
-      _nameController.text = user.fullName ?? "";
-      _emailController.text = user.email ?? "";
-      _passwordController.text = user.password ?? "";
-
-      // Update state variables
-      setState(() {
-        _selectedAccountType = user.accountType ?? "";
-        _weightValue = user.weight ?? 0;
-        _selectedGender = user.gender ?? '';
-        _selectedLocation = user.location ?? "";
-      });
+      _nameController.text = user.name;
+      _emailController.text = user.email;
+      _weightValue = user.weight.toDouble();
     }
   }
 
@@ -71,7 +51,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
@@ -104,15 +83,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           color: Colors.black.withOpacity(0.2),
                           border: Border.all(color: Colors.white, width: 2),
                           image:
-                              user?.profileImageUrl != null
+                              user?.profileImage != null
                                   ? DecorationImage(
-                                    image: NetworkImage(user!.profileImageUrl!),
+                                    image: NetworkImage(user!.profileImage!),
                                     fit: BoxFit.cover,
                                   )
                                   : null,
                         ),
                         child:
-                            user?.profileImageUrl == null
+                            user?.profileImage == null
                                 ? const Center(
                                   child: Icon(
                                     Icons.person,
@@ -158,12 +137,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   keyboardType: TextInputType.emailAddress,
                 ),
 
-                const SizedBox(height: 16),
-                ProfilePasswordField(
-                  label: "Password",
-                  controller: _passwordController,
-                ),
+                // const SizedBox(height: 16),
 
+                // ProfilePasswordField(
+                //   label: "Password",
+                //   controller: _passwordController,
+                // ),
                 const SizedBox(height: 20),
                 const Text(
                   "Account Type",
@@ -175,6 +154,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
 
                 const SizedBox(height: 20),
+
                 ProfileWeightSlider(
                   value: _weightValue,
                   onChanged: (value) {
@@ -185,50 +165,49 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   min: 30,
                   max: 150,
                 ),
-
                 const SizedBox(height: 20),
-                ProfileDropdownField(
-                  label: "Gender",
-                  value: _selectedGender,
-                  icon: Icons.transgender,
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedGender = value;
-                      });
-                    }
-                  },
-                  items: const [
-                    "Male",
-                    "Female",
-                    "Trans Male",
-                    "Trans Female",
-                    "Non-Binary",
-                    "Other",
-                  ],
-                ),
 
+                // ProfileDropdownField(
+                //   label: "Gender",
+                //   value: _selectedGender,
+                //   icon: Icons.transgender,
+                //   onChanged: (value) {
+                //     if (value != null) {
+                //       setState(() {
+                //         _selectedGender = value;
+                //       });
+                //     }
+                //   },
+                //   items: const [
+                //     "Male",
+                //     "Female",
+                //     "Trans Male",
+                //     "Trans Female",
+                //     "Non-Binary",
+                //     "Other",
+                //   ],
+                // ),
                 const SizedBox(height: 16),
-                ProfileDropdownField(
-                  label: "Location",
-                  value: _selectedLocation,
-                  icon: Icons.location_on_outlined,
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedLocation = value;
-                      });
-                    }
-                  },
-                  items: const [
-                    "Tokyo, Japan",
-                    "New York, USA",
-                    "London, UK",
-                    "Paris, France",
-                    "Sydney, Australia",
-                  ],
-                ),
 
+                // ProfileDropdownField(
+                //   label: "Location",
+                //   value: _selectedLocation,
+                //   icon: Icons.location_on_outlined,
+                //   onChanged: (value) {
+                //     if (value != null) {
+                //       setState(() {
+                //         _selectedLocation = value;
+                //       });
+                //     }
+                //   },
+                //   items: const [
+                //     "Tokyo, Japan",
+                //     "New York, USA",
+                //     "London, UK",
+                //     "Paris, France",
+                //     "Sydney, Australia",
+                //   ],
+                // ),
                 const SizedBox(height: 30),
                 ProfileButton(
                   label: "Save Changes",
@@ -248,9 +227,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   void _handleSubmit() {
     // Validate form fields
-    if (_nameController.text.isEmpty ||
-        _emailController.text.isEmpty ||
-        _passwordController.text.isEmpty) {
+    if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all required fields')),
       );
@@ -260,13 +237,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     // Update the user profile in the provider
     final notifier = ref.read(homeProvider.notifier);
     notifier.updateUserProfile(
-      fullName: _nameController.text,
+      name: _nameController.text,
       email: _emailController.text,
-      password: _passwordController.text,
-      accountType: _selectedAccountType,
       weight: _weightValue,
-      gender: _selectedGender,
-      location: _selectedLocation,
+      // gender: _selectedGender,
+      // location: _selectedLocation,
     );
 
     // Show success message
