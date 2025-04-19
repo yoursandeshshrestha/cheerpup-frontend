@@ -1,20 +1,45 @@
+import 'package:cheerpup/pages/chat_history/chat_history.dart';
 import 'package:cheerpup/pages/home_page/home_page.dart';
+import 'package:cheerpup/pages/layout/layout_page.dart';
 import 'package:cheerpup/pages/login/login_page.dart';
+import 'package:cheerpup/pages/not_found/not_found.dart';
 import 'package:cheerpup/pages/onboarding_page/onboarding_page.dart';
 import 'package:cheerpup/pages/profile_page/profile_page.dart';
 import 'package:cheerpup/pages/signup/signup_page.dart';
 import 'package:cheerpup/pages/welcome_page/welcome_page.dart';
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/welcome',
+  initialLocation: '/',
   routes: [
-    GoRoute(
-      path: '/',
-      name: 'home',
-      builder: (context, state) => const HomePage(),
+    ShellRoute(
+      builder: (context, state, child) {
+        return LayoutPage(child: child);
+      },
+      routes: [
+        GoRoute(
+          path: '/',
+          name: 'home',
+          builder: (context, state) => const HomePage(),
+        ),
+        GoRoute(
+          path: '/chat-history',
+          name: 'chat-history',
+          builder: (context, state) => const ChatHistory(),
+        ),
+        GoRoute(
+          path: '/activities',
+          name: 'activities',
+          builder: (context, state) => const HomePage(),
+        ),
+        GoRoute(
+          path: '/profile',
+          name: 'profile',
+          builder: (context, state) => const ProfilePage(),
+        ),
+      ],
     ),
+
     GoRoute(
       path: '/welcome',
       name: 'welcome',
@@ -25,11 +50,7 @@ final GoRouter appRouter = GoRouter(
       name: 'onboarding',
       builder: (context, state) => const OnboardingPage(),
     ),
-    GoRoute(
-      path: '/profile',
-      name: 'profile',
-      builder: (context, state) => const ProfilePage(),
-    ),
+
     GoRoute(
       path: '/login',
       name: 'login',
@@ -41,7 +62,5 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const SignupPage(),
     ),
   ],
-  errorBuilder:
-      (context, state) =>
-          const Scaffold(body: Center(child: Text('404 - Page not found'))),
+  errorBuilder: (context, state) => NotFound(),
 );
