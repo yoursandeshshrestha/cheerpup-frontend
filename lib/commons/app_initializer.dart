@@ -1,0 +1,2 @@
+// App Initializer
+class AppInitializer {}
