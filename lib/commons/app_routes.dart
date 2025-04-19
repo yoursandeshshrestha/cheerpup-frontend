@@ -3,7 +3,6 @@ import 'package:cheerpup/pages/home_page/home_page.dart';
 import 'package:cheerpup/pages/layout/layout_page.dart';
 import 'package:cheerpup/pages/login/login_page.dart';
 import 'package:cheerpup/pages/not_found/not_found.dart';
-import 'package:cheerpup/pages/login/widgets/login_screen_one_widget.dart';
 import 'package:cheerpup/pages/onboarding_page/onboarding_page.dart';
 import 'package:cheerpup/pages/profile_page/profile_page.dart';
 import 'package:cheerpup/pages/signup/signup_page.dart';
@@ -11,13 +10,36 @@ import 'package:cheerpup/pages/welcome_page/welcome_page.dart';
 import 'package:go_router/go_router.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/',
   routes: [
-    GoRoute(
-      path: '/',
-      name: 'home',
-      builder: (context, state) => const HomePage(),
+    ShellRoute(
+      builder: (context, state, child) {
+        return LayoutPage(child: child);
+      },
+      routes: [
+        GoRoute(
+          path: '/',
+          name: 'home',
+          builder: (context, state) => const HomePage(),
+        ),
+        GoRoute(
+          path: '/chat-history',
+          name: 'chat-history',
+          builder: (context, state) => const ChatHistory(),
+        ),
+        GoRoute(
+          path: '/activities',
+          name: 'activities',
+          builder: (context, state) => const HomePage(),
+        ),
+        GoRoute(
+          path: '/profile',
+          name: 'profile',
+          builder: (context, state) => const ProfilePage(),
+        ),
+      ],
     ),
+
     GoRoute(
       path: '/welcome',
       name: 'welcome',
