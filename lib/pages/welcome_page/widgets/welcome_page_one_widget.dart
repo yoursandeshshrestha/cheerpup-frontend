@@ -22,12 +22,12 @@ class WelcomeScreenOne extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Center(
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    width: 40,
-                    height: 40,
-                    color: Colors.white,
-                  ),
+                  // child: Image.asset(
+                  //   'assets/images/logo.png',
+                  //   width: 40,
+                  //   height: 40,
+                  //   color: Colors.white,
+                  // ),
                 ),
               ),
               const SizedBox(height: 40),
@@ -62,11 +62,11 @@ class WelcomeScreenOne extends StatelessWidget {
               Stack(
                 alignment: Alignment.center,
                 children: [
-                  Image.asset(
-                    'assets/images/character.png',
-                    width: 300,
-                    height: 300,
-                  ),
+                  // Image.asset(
+                  //   'assets/images/character.png',
+                  //   width: 300,
+                  //   height: 300,
+                  // ),
                   // Positioning the icons around the character
                   Positioned(
                     top: 0,

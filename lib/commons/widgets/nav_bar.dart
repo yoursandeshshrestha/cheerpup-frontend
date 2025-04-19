@@ -31,6 +31,7 @@ class NavBar extends StatelessWidget {
         children: [
           _buildNavItem(0, Icons.home, "Home"),
           _buildNavItem(1, Icons.chat_bubble_outline, "Messages"),
+          // Center space for FAB
           const SizedBox(width: 60),
           _buildNavItem(2, Icons.bar_chart, "Stats"),
           _buildNavItem(3, Icons.person_outline, "Profile"),
