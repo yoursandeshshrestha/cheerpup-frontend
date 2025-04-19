@@ -249,13 +249,13 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
         borderRadius: BorderRadius.circular(25),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             child: TextField(
               controller: _messageController,
               enabled: !isLoading, // Disable input during loading
-              minLines: 2,
+              minLines: 1,
               maxLines: 4,
               decoration: const InputDecoration(
                 hintText: 'What\'s on your mind?',
