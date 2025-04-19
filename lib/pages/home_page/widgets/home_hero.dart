@@ -1,4 +1,5 @@
-import 'package:cheerpup/commons/entities/user.dart';
+import 'package:cheerpup/commons/models/user_model.dart';
+import 'package:cheerpup/commons/utils.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_provider.dart';
 import 'package:cheerpup/pages/layout/layout_page.dart';
 import 'package:flutter/material.dart';
@@ -92,7 +93,7 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
     );
   }
 
-  Widget _buildUserDetails(User? user) {
+  Widget _buildUserDetails(UserModel? user) {
     return Row(
       children: [
         _buildProfileImage(user),
@@ -102,7 +103,7 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
           children: [
             Text(
               user != null
-                  ? 'Hi, ${(user.fullName ?? "").split(' ').first}!'
+                  ? 'Hi, ${(user.name).split(' ').first}!'
                   : 'Hi there!',
               style: const TextStyle(
                 color: Colors.white,
@@ -119,7 +120,7 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
   }
 
   // Widget to build the profile image
-  Widget _buildProfileImage(User? user) {
+  Widget _buildProfileImage(UserModel? user) {
     return Container(
       width: 50,
       height: 50,
@@ -128,15 +129,15 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
         color: Colors.white.withOpacity(0.2),
         border: Border.all(color: Colors.white, width: 2),
         image:
-            user?.profileImageUrl != null
+            user?.profileImage != null
                 ? DecorationImage(
-                  image: NetworkImage(user!.profileImageUrl!),
+                  image: NetworkImage(user!.profileImage!),
                   fit: BoxFit.cover,
                 )
                 : null,
       ),
       child:
-          user?.profileImageUrl == null
+          user?.profileImage == null
               ? const Center(
                 child: Icon(Icons.person, color: Colors.white, size: 30),
               )
@@ -145,78 +146,76 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
   }
 
   // Widget to build the user stats row (badges)
-  Widget _buildUserStats(User? user) {
+  Widget _buildUserStats(UserModel? user) {
     return Row(
       children: [
         // Pro badge - show only if user is subscribed
-        if (user?.isSubscribed == true) ...[
-          _buildProBadge(),
-          const SizedBox(width: 8),
-        ],
+        // if (user?.isSubscribed == true) ...[
+        //   _buildProBadge(),
+        //   const SizedBox(width: 8),
+        // ],
 
         // Progress indicator
-        if (user != null) _buildProgressIndicator(user),
-
+        // if (user != null) _buildProgressIndicator(user),
         const SizedBox(width: 8),
 
         // Mood indicator
-        if (user != null) _buildMoodIndicator(user),
+        if (user != null && user.moods.isNotEmpty) _buildMoodIndicator(user),
       ],
     );
   }
 
   // Widget to build the Pro badge
-  Widget _buildProBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.star, color: Colors.white, size: 14),
-          SizedBox(width: 4),
-          Text(
-            'Pro',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildProBadge() {
+  //   return Container(
+  //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+  //     decoration: BoxDecoration(
+  //       color: Colors.green,
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: const Row(
+  //       children: [
+  //         Icon(Icons.star, color: Colors.white, size: 14),
+  //         SizedBox(width: 4),
+  //         Text(
+  //           'Pro',
+  //           style: TextStyle(
+  //             color: Colors.white,
+  //             fontSize: 12,
+  //             fontWeight: FontWeight.w500,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   // Widget to build the progress indicator
-  Widget _buildProgressIndicator(User user) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.orange,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.auto_awesome, color: Colors.white, size: 14),
-          const SizedBox(width: 4),
-          Text(
-            '${user.progressPercentage.toInt()}%',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildProgressIndicator(UserModel user) {
+  //   return Container(
+  //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+  //     decoration: BoxDecoration(
+  //       color: Colors.orange,
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         const Icon(Icons.auto_awesome, color: Colors.white, size: 14),
+  //         const SizedBox(width: 4),
+  //         Text(
+  //           '${user.progressPercentage.toInt()}%',
+  //           style: const TextStyle(
+  //             color: Colors.white,
+  //             fontSize: 12,
+  //             fontWeight: FontWeight.w500,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  // Widget to build the mood indicator
-  Widget _buildMoodIndicator(User user) {
+  Widget _buildMoodIndicator(UserModel user) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
@@ -225,10 +224,10 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
       ),
       child: Row(
         children: [
-          user.moodEmoji,
+          Utils.getMoodEmoji(user.moods.first.moodRating),
           const SizedBox(width: 4),
           Text(
-            user.mood,
+            user.moods.first.mood,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 12,
