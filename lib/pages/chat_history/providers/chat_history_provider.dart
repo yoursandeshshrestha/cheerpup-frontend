@@ -1,22 +1,29 @@
-import 'package:cheerpup/pages/chat_history/model/chat_message.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:cheerpup/pages/chat_history/model/chat_message.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ChatHistoryNotifier extends StateNotifier<List<ChatMessage>> {
-  ChatHistoryNotifier() : super([]);
+// class ChatHistoryNotifier extends StateNotifier<List<ChatHistoryModel>> {
+//   ChatHistoryNotifier() : super([]);
 
-  void addChat(ChatMessage message) {
-    state = [...state, message];
-  }
+//   void addChat(ChatHistoryModel message) {
+//     state = [...state, message];
+//   }
 
-  ChatMessage? getChatById(String id) {
-    return state.firstWhere(
-      (msg) => msg.id == id,
-      orElse: () => ChatMessage(id: '', preview: '', fullResponse: ''),
-    );
-  }
-}
+//   ChatHistoryModel? getChatById(String id) {
+//     return state.firstWhere(
+//       (msg) => msg.id == id,
+//       orElse:
+//           () => ChatHistoryModel(
+//             id: '',
 
-final chatHistoryProvider =
-    StateNotifierProvider<ChatHistoryNotifier, List<ChatMessage>>(
-      (ref) => ChatHistoryNotifier(),
-    );
+//             userMessage: '',
+//             systemMessage: '',
+//             suggestedMusicLinks: [],
+//           ),
+//     );
+//   }
+// }
+
+// final chatHistoryProvider =
+//     StateNotifierProvider<ChatHistoryNotifier, List<ChatHistoryModel>>(
+//       (ref) => ChatHistoryNotifier(),
+//     );

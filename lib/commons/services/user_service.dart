@@ -112,7 +112,7 @@ class UserService {
       }
 
       final headers = await _getHeaders();
-      final response = await http.patch(
+      final response = await http.put(
         Uri.parse('$_baseUrl/$userId'),
         headers: headers,
         body: jsonEncode(dto.toJson()),

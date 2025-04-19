@@ -1,6 +1,6 @@
+import 'package:cheerpup/pages/home_page/riverpod/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/chat_history_provider.dart';
 
 class ChatDetailScreen extends ConsumerWidget {
   final String chatId;
@@ -9,7 +9,9 @@ class ChatDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chat = ref.read(chatHistoryProvider.notifier).getChatById(chatId);
+    final homepageState = ref.watch(homeProvider);
+    final chats = homepageState.currentUser!.apiChatHistory;
+    final chat = chats.firstWhere((chat) => chat.id == chatId);
 
     return Container(
       decoration: BoxDecoration(
@@ -69,17 +71,17 @@ class ChatDetailScreen extends ConsumerWidget {
                       ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (chat.timestamp != null)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: Text(
-                                _formatTimestamp(chat.timestamp!),
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: Colors.grey),
-                              ),
-                            ),
+                          // if (chat.timestamp != null)
+                          //   Padding(
+                          //     padding: const EdgeInsets.only(bottom: 16),
+                          //     child: Text(
+                          //       _formatTimestamp(chat.timestamp!),
+                          //       style: Theme.of(context).textTheme.bodySmall
+                          //           ?.copyWith(color: Colors.grey),
+                          //     ),
+                          //   ),
                           Text(
-                            chat.fullResponse,
+                            chat.systemMessage,
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ],
