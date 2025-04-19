@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class SignInState {
   final bool isLoading;
@@ -10,7 +12,11 @@ class SignInState {
 class SignInNotifier extends StateNotifier<SignInState> {
   SignInNotifier() : super(SignInState());
 
-  Future<void> signIn(String email, String password) async {
+  Future<void> signIn(
+    String email,
+    String password,
+    BuildContext context,
+  ) async {
     state = SignInState(isLoading: true);
     try {
       await Future.delayed(const Duration(seconds: 2)); // simulate login

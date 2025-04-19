@@ -1,3 +1,4 @@
+import 'package:cheerpup/pages/activities/activities_page.dart';
 import 'package:cheerpup/pages/chat_history/chat_history.dart';
 import 'package:cheerpup/pages/home_page/home_page.dart';
 import 'package:cheerpup/pages/layout/layout_page.dart';
@@ -30,7 +31,7 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/activities',
           name: 'activities',
-          builder: (context, state) => const HomePage(),
+          builder: (context, state) => const ActivitiesPage(),
         ),
         GoRoute(
           path: '/profile',

@@ -101,7 +101,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         height: 100,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.black.withOpacity(0.2),
                           border: Border.all(color: Colors.white, width: 2),
                           image:
                               user?.profileImageUrl != null

@@ -6,9 +6,6 @@ class ChatHistory extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(children: [
-        
-      ],
-    );
+    return Container(child: Center(child: Text("Chat history Page")));
   }
 }

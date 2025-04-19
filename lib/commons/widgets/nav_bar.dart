@@ -33,10 +33,16 @@ class NavBar extends ConsumerWidget {
             context,
             1,
             Icons.chat_bubble_outline,
-            "Messages",
+            "Chat History",
             selectedIndex,
           ),
-          _buildNavItem(context, 2, Icons.bar_chart, "Stats", selectedIndex),
+          _buildNavItem(
+            context,
+            2,
+            Icons.sports_gymnastics_outlined,
+            "Activities",
+            selectedIndex,
+          ),
           _buildNavItem(
             context,
             3,

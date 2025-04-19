@@ -29,16 +29,16 @@ class LayoutPage extends ConsumerWidget {
                   ref.read(navigationIndexProvider.notifier).state = index;
                   switch (index) {
                     case 0:
-                      context.go('/');
+                      context.replace('/');
                       break;
                     case 1:
-                      context.go('/messages');
+                      context.replace('/chat-history');
                       break;
                     case 2:
-                      context.go('/stats');
+                      context.replace('/activities');
                       break;
                     case 3:
-                      context.go('/profile');
+                      context.replace('/profile');
                       break;
                   }
                 },

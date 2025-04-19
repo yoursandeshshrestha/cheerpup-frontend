@@ -32,7 +32,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    ref.read(signInProvider.notifier).signIn(email, password);
+    context.goNamed("home");
+    // ref.read(signInProvider.notifier).signIn(email, password);
   }
 
   @override
