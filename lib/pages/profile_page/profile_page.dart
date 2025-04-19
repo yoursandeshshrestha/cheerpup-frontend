@@ -1,3 +1,4 @@
+import 'package:cheerpup/commons/services/auth_service.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,6 +59,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Widget build(BuildContext context) {
     final homeState = ref.watch(homeProvider);
     final user = homeState.currentUser;
+    final authService = ref.read(authServiceProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -217,6 +219,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
 
                 const SizedBox(height: 30),
+                ProfileButton(
+                  label: "Logout",
+                  onPressed: () async {
+                    await ref.read(authServiceProvider).logout();
+                    context.goNamed('login'); // Navigate to login after logout
+                  },
+                ),
               ],
             ),
           ),

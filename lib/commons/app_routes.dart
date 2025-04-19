@@ -1,3 +1,4 @@
+import 'package:cheerpup/commons/services/auth_service.dart';
 import 'package:cheerpup/pages/activities/activities_page.dart';
 import 'package:cheerpup/pages/chat_history/chat_history.dart';
 import 'package:cheerpup/pages/home_page/home_page.dart';
@@ -10,58 +11,87 @@ import 'package:cheerpup/pages/signup/signup_page.dart';
 import 'package:cheerpup/pages/welcome_page/welcome_page.dart';
 import 'package:go_router/go_router.dart';
 
-final GoRouter appRouter = GoRouter(
-  initialLocation: '/login',
-  routes: [
-    ShellRoute(
-      builder: (context, state, child) {
-        return LayoutPage(child: child);
+class AppRouter {
+  static late final GoRouter router;
+
+  static Future<void> initialize() async {
+    final authService = AuthService();
+    final isAuthenticated = await authService.isAuthenticated();
+
+    router = GoRouter(
+      initialLocation: isAuthenticated ? '/' : '/login',
+      refreshListenable: authService,
+      redirect: (context, state) async {
+        final isLoggedIn = await authService.isAuthenticated();
+        final isGoingToAuth =
+            state.matchedLocation == '/login' ||
+            state.matchedLocation == '/signup' ||
+            state.matchedLocation == '/welcome' ||
+            state.matchedLocation == '/onboarding';
+
+        // If not logged in and trying to access protected routes
+        if (!isLoggedIn && !isGoingToAuth) {
+          return '/login';
+        }
+
+        // If logged in and trying to access auth routes
+        if (isLoggedIn && isGoingToAuth) {
+          return '/';
+        }
+
+        // No redirection needed
+        return null;
       },
       routes: [
-        GoRoute(
-          path: '/',
-          name: 'home',
-          builder: (context, state) => const HomePage(),
+        ShellRoute(
+          builder: (context, state, child) {
+            return LayoutPage(child: child);
+          },
+          routes: [
+            GoRoute(
+              path: '/',
+              name: 'home',
+              builder: (context, state) => const HomePage(),
+            ),
+            GoRoute(
+              path: '/chat-history',
+              name: 'chat-history',
+              builder: (context, state) => const ChatHistory(),
+            ),
+            GoRoute(
+              path: '/activities',
+              name: 'activities',
+              builder: (context, state) => const ActivitiesPage(),
+            ),
+            GoRoute(
+              path: '/profile',
+              name: 'profile',
+              builder: (context, state) => const ProfilePage(),
+            ),
+          ],
         ),
         GoRoute(
-          path: '/chat-history',
-          name: 'chat-history',
-          builder: (context, state) => const ChatHistory(),
+          path: '/welcome',
+          name: 'welcome',
+          builder: (context, state) => const WelcomePage(),
         ),
         GoRoute(
-          path: '/activities',
-          name: 'activities',
-          builder: (context, state) => const ActivitiesPage(),
+          path: '/onboarding',
+          name: 'onboarding',
+          builder: (context, state) => const OnboardingPage(),
         ),
         GoRoute(
-          path: '/profile',
-          name: 'profile',
-          builder: (context, state) => const ProfilePage(),
+          path: '/login',
+          name: 'login',
+          builder: (context, state) => const LoginPage(),
+        ),
+        GoRoute(
+          path: '/signup',
+          name: 'signup',
+          builder: (context, state) => const SignupPage(),
         ),
       ],
-    ),
-
-    GoRoute(
-      path: '/welcome',
-      name: 'welcome',
-      builder: (context, state) => const WelcomePage(),
-    ),
-    GoRoute(
-      path: '/onboarding',
-      name: 'onboarding',
-      builder: (context, state) => const OnboardingPage(),
-    ),
-
-    GoRoute(
-      path: '/login',
-      name: 'login',
-      builder: (context, state) => const LoginPage(),
-    ),
-    GoRoute(
-      path: '/signup',
-      name: 'signup',
-      builder: (context, state) => const SignupPage(),
-    ),
-  ],
-  errorBuilder: (context, state) => NotFound(),
-);
+      errorBuilder: (context, state) => const NotFound(),
+    );
+  }
+}

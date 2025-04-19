@@ -7,5 +7,5 @@ import 'package:cheerpup/pages/signup/riverpod/signup_state.dart';
 final signupProvider = StateNotifierProvider<SignupNotifier, SignupState>((
   ref,
 ) {
-  return SignupNotifier();
+  return SignupNotifier(ref);
 });

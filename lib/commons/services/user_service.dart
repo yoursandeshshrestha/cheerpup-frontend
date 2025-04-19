@@ -1,4 +1,4 @@
-// lib\commons\services\user_service.dart
+// lib/commons/services/user_service.dart
 
 import 'dart:convert';
 import 'package:cheerpup/commons/constants/api_constants.dart';
@@ -6,16 +6,23 @@ import 'package:cheerpup/commons/models/dto/create_user_dto.dart';
 import 'package:cheerpup/commons/models/dto/login_user.dto.dart';
 import 'package:cheerpup/commons/models/dto/update_user_dto.dart';
 import 'package:http/http.dart' as http;
+import 'package:hive_flutter/hive_flutter.dart';
 
 class UserService {
   final String _baseUrl = ApiConstants.baseUrl;
+  final String _authBox = 'auth_box';
+  final String _authTokenKey = 'auth_token';
+  final String _userIdKey = 'user_id';
 
   Future<Map<String, String>> _getHeaders() async {
-    final token = 'your-auth-token';
+    final box = await Hive.openBox(_authBox);
+    final token = box.get(_authTokenKey);
+
+    print("UserService - Getting headers with token: $token");
 
     return {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
+      'token': token != null ? 'Bearer $token' : '',
     };
   }
 
@@ -39,6 +46,7 @@ class UserService {
         };
       }
     } catch (e) {
+      print("Error in createUser: $e");
       return {
         'success': false,
         'message': 'An error occurred: ${e.toString()}',
@@ -46,7 +54,7 @@ class UserService {
     }
   }
 
-  // Create user (signup)
+  // Login user
   Future<Map<String, dynamic>> loginUser(LoginUserDto dto) async {
     try {
       final response = await http.post(
@@ -56,6 +64,7 @@ class UserService {
       );
 
       final responseData = jsonDecode(response.body);
+      print("Login response: ${response.statusCode}, data: $responseData");
 
       // Return success based on HTTP status code from the server
       return {
@@ -65,6 +74,7 @@ class UserService {
         'statusCode': response.statusCode,
       };
     } catch (e) {
+      print("Error in loginUser: $e");
       return {
         'success': false,
         'message': 'An error occurred: ${e.toString()}',
@@ -77,10 +87,18 @@ class UserService {
   Future<Map<String, dynamic>> getCurrentUser() async {
     try {
       final headers = await _getHeaders();
+      print("getCurrentUser headers: $headers");
+
+      final box = await Hive.openBox(_authBox);
+      final userId = box.get(_userIdKey);
+
       final response = await http.get(
-        Uri.parse('$_baseUrl/me'),
+        Uri.parse('$_baseUrl/user/$userId'),
         headers: headers,
       );
+
+      print("getCurrentUser response status: ${response.statusCode}");
+      print("getCurrentUser response body: ${response.body}");
 
       final responseData = jsonDecode(response.body);
 
@@ -93,6 +111,7 @@ class UserService {
         };
       }
     } catch (e) {
+      print("Error in getCurrentUser: $e");
       return {
         'success': false,
         'message': 'An error occurred: ${e.toString()}',
@@ -129,6 +148,7 @@ class UserService {
         };
       }
     } catch (e) {
+      print("Error in updateUser: $e");
       return {
         'success': false,
         'message': 'An error occurred: ${e.toString()}',
@@ -155,6 +175,7 @@ class UserService {
         };
       }
     } catch (e) {
+      print("Error in deleteUser: $e");
       return {
         'success': false,
         'message': 'An error occurred: ${e.toString()}',

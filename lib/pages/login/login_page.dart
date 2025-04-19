@@ -18,8 +18,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _identifierFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
 
-  bool _isEmail =
-      true; // Flag to determine if input is email or phone (for UI only)
+  bool _isEmail = true;
 
   @override
   void dispose() {
@@ -60,10 +59,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final loginState = ref.watch(loginProvider);
 
+    print(
+      "Login page build - token: ${loginState.token}, isLoading: ${loginState.isLoading}",
+    );
+
     // If login was successful and we have a token, navigate to home
     if (loginState.token != null && !loginState.isLoading) {
+      print("Navigation condition met - redirecting to home");
       // Use addPostFrameCallback to avoid build-during-build errors
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        print("Navigation condition met - redirecting to home");
         context.goNamed("home");
       });
     }
@@ -285,7 +290,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 16),
 
                 // --- Sign Up Link ---
                 Row(

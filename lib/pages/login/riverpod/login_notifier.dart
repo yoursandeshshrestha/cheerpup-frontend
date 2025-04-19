@@ -1,14 +1,12 @@
 // lib/pages/login/riverpod/login_notifier.dart
 
 import 'package:cheerpup/commons/models/dto/login_user.dto.dart';
+import 'package:cheerpup/commons/services/auth_service.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cheerpup/commons/services/user_service.dart';
 import 'package:cheerpup/pages/login/riverpod/login_state.dart';
 
 class LoginNotifier extends StateNotifier<LoginState> {
-  final UserService _userService = UserService();
   final Ref _ref;
 
   LoginNotifier(this._ref) : super(LoginState.initial());
@@ -27,21 +25,19 @@ class LoginNotifier extends StateNotifier<LoginState> {
         password: password,
       );
 
-      // Call user service to login
-      final result = await _userService.loginUser(loginUserDto);
+      // Use AuthService to handle login
+      final authService = _ref.read(authServiceProvider);
+      final result = await authService.login(loginUserDto);
 
       if (result['success']) {
-        // Extract data from successful response
-        final responseData = result['data'];
-        final token = responseData['token'];
-        final userData = responseData['user'];
-
-        // Save token to shared preferences for persistent login
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', token);
+        // Get userData and token from AuthService
+        final userData = authService.userData;
+        final token = authService.token;
 
         // Initialize home page state with user data
-        _ref.read(homeProvider.notifier).initializeUserData(userData);
+        if (userData != null) {
+          _ref.read(homeProvider.notifier).initializeUserData(userData);
+        }
 
         // Update state with success data
         state = state.copyWith(
@@ -50,7 +46,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
           userData: userData,
         );
 
-        print('Login successful for user: ${userData['name']}');
+        print('Login successful for user: ${userData?['name']}');
       } else {
         // Handle login error
         final errorMessage =
