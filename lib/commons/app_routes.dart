@@ -11,7 +11,7 @@ import 'package:cheerpup/pages/welcome_page/welcome_page.dart';
 import 'package:go_router/go_router.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/chat-history',
   routes: [
     ShellRoute(
       builder: (context, state, child) {
