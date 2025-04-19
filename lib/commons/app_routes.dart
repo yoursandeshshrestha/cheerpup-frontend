@@ -1,5 +1,6 @@
 import 'package:cheerpup/pages/home_page/home_page.dart';
 import 'package:cheerpup/pages/login/login_page.dart';
+import 'package:cheerpup/pages/login/widgets/login_screen_one_widget.dart';
 import 'package:cheerpup/pages/onboarding_page/onboarding_page.dart';
 import 'package:cheerpup/pages/profile_page/profile_page.dart';
 import 'package:cheerpup/pages/signup/signup_page.dart';
@@ -8,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/welcome',
+  initialLocation: '/login',
   routes: [
     GoRoute(
       path: '/',
