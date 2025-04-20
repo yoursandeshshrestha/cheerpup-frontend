@@ -1,7 +1,9 @@
 import 'package:cheerpup/pages/home_page/riverpod/home_provider.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_state.dart';
+import 'package:cheerpup/pages/home_page/widgets/mood_stats_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeContent extends ConsumerWidget {
   const HomeContent({super.key});
@@ -15,6 +17,9 @@ class HomeContent extends ConsumerWidget {
     final suggestedActivities = homeState.suggestedActivities;
     final suggestedExercises = homeState.suggestedExercises;
     final suggestedMusic = homeState.suggestedMusic;
+    final mood = homeState.mood;
+    final user = homeState.currentUser;
+    final userMoods = user?.moods ?? [];
 
     // Background color for the content area
     return Container(
@@ -29,6 +34,14 @@ class HomeContent extends ConsumerWidget {
             // Messages section (AI responses only)
             if (messages.isNotEmpty) ...[
               _buildMessagesSection(context, messages),
+              const SizedBox(height: 28),
+            ],
+
+            // Mood emoji box (if mood is available)
+            if (mood != null) ...[
+              _buildSectionTitle('Your Mood', Icons.sentiment_satisfied_alt),
+              const SizedBox(height: 12),
+              _buildMoodEmojiBox(context, mood),
               const SizedBox(height: 28),
             ],
 
@@ -60,6 +73,12 @@ class HomeContent extends ConsumerWidget {
               ),
               const SizedBox(height: 40),
             ],
+
+            // Mood Stats section (always show)
+            _buildSectionTitle('Mood Stats', Icons.insights),
+            const SizedBox(height: 12),
+            MoodStatsWidget(moods: userMoods),
+            const SizedBox(height: 28),
           ],
         ),
       ),
@@ -101,72 +120,91 @@ class HomeContent extends ConsumerWidget {
     );
   }
 
+  Future<void> _openYouTubeSearch(String songTitle) async {
+    try {
+      final encodedQuery = Uri.encodeComponent(songTitle);
+      final url = Uri.parse(
+        'https://www.youtube.com/results?search_query=$encodedQuery',
+      );
+
+      // Skip the canLaunchUrl check which can cause channel errors
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Error launching YouTube: $e');
+      // Show a snackbar or alert here if desired
+    }
+  }
+
   Widget _buildMusicSection(BuildContext context, SuggestedMusic music) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('Music For You', Icons.music_note),
         const SizedBox(height: 12),
-        Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.indigo.shade800, Colors.indigo.shade600],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.indigo.withOpacity(0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+        InkWell(
+          onTap: () => _openYouTubeSearch(music.title),
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.indigo.shade800, Colors.indigo.shade600],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Container(
-                  height: 60,
-                  width: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.play_circle_filled,
-                    color: Colors.white,
-                    size: 40,
-                  ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.indigo.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        music.title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Tap to listen",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.open_in_new, color: Colors.white, size: 24),
               ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.play_circle_filled,
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          music.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Tap to listen",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white.withOpacity(0.8),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.open_in_new, color: Colors.white, size: 24),
+                ],
+              ),
             ),
           ),
         ),
@@ -462,6 +500,175 @@ class HomeContent extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // Add this method to HomeContent class
+
+  Widget _buildMoodEmojiBox(BuildContext context, Mood mood) {
+    // Get emoji and background color based on mood rating
+    final (String emoji, Color color) = _getMoodEmojiAndColor(mood.moodRating);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: const Color(0xFFEADDD7), width: 1),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.emoji_emotions_outlined,
+                    color: color,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    "Current Mood",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 50)),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      mood.mood,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    _buildMoodRatingStars(mood.moodRating),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildMoodAdvice(mood.moodRating),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper method to get emoji and color based on mood rating
+  (String, Color) _getMoodEmojiAndColor(int moodRating) {
+    switch (moodRating) {
+      case 1:
+        return ('😢', Colors.red.shade700);
+      case 2:
+        return ('😔', Colors.orange.shade700);
+      case 3:
+        return ('😐', Colors.amber.shade700);
+      case 4:
+        return ('🙂', Colors.lightGreen.shade700);
+      case 5:
+        return ('😄', Colors.green.shade700);
+      default:
+        return ('😐', Colors.amber.shade700);
+    }
+  }
+
+  // Helper method to build mood rating stars
+  Widget _buildMoodRatingStars(int rating) {
+    return Row(
+      children: List.generate(5, (index) {
+        return Icon(
+          index < rating ? Icons.star : Icons.star_border,
+          color: Colors.amber.shade600,
+          size: 18,
+        );
+      }),
+    );
+  }
+
+  // Helper method to provide advice based on mood
+  Widget _buildMoodAdvice(int rating) {
+    String advice;
+
+    switch (rating) {
+      case 1:
+        advice =
+            "Take a moment for yourself. Remember that feelings are temporary and it's okay to seek support.";
+        break;
+      case 2:
+        advice =
+            "Try doing something that brings you joy today, even if it's small. A little self-care can go a long way.";
+        break;
+      case 3:
+        advice =
+            "You're doing okay. Consider trying a new activity or connecting with a friend to brighten your day.";
+        break;
+      case 4:
+        advice =
+            "You're feeling good! This is a great time to be productive or engage in activities you enjoy.";
+        break;
+      case 5:
+        advice =
+            "Fantastic! Your positive energy can help both yourself and others. Consider sharing your joy!";
+        break;
+      default:
+        advice = "Take each moment as it comes and be kind to yourself.";
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.lightbulb_outline, color: Colors.amber.shade700, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              advice,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade800,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

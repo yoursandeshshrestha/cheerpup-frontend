@@ -2,6 +2,8 @@ import 'package:cheerpup/commons/models/user_model.dart';
 import 'package:cheerpup/commons/services/chat_service.dart';
 import 'package:cheerpup/pages/chat_history/model/chat_message.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_state.dart';
+import 'package:cheerpup/pages/home_page/widgets/add_exercise_bottomsheet.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomePageNotifier extends StateNotifier<HomeState> {
@@ -17,6 +19,9 @@ class HomePageNotifier extends StateNotifier<HomeState> {
       final userModel = UserModel.fromJson(userData);
 
       state = state.copyWith(currentUser: userModel);
+
+      // Check message limit based on chat history timestamps
+      checkMessageLimit();
 
       print('User data initialized successfully: ${userModel.name}');
     } catch (e) {
@@ -134,7 +139,7 @@ class HomePageNotifier extends StateNotifier<HomeState> {
         );
 
         // Fetch updated user chat history
-        _updateUserChatHistory();
+        updateUserChatHistory();
       } else {
         // Handle error response
         final errorMessage = Message(
@@ -172,7 +177,7 @@ class HomePageNotifier extends StateNotifier<HomeState> {
   }
 
   // Fetch and update user chat history
-  Future<void> _updateUserChatHistory() async {
+  Future<void> updateUserChatHistory() async {
     try {
       // Fetch the chat history
       final response = await _chatService.getUserChatHistory();
@@ -195,6 +200,9 @@ class HomePageNotifier extends StateNotifier<HomeState> {
 
             // Update state with the updated user
             state = state.copyWith(currentUser: updatedUser);
+
+            // Check message limit after updating chat history
+            checkMessageLimit();
 
             print(
               'Chat history updated successfully with ${chatHistory.length} items',
@@ -235,19 +243,59 @@ class HomePageNotifier extends StateNotifier<HomeState> {
     return [];
   }
 
-  // Toggle activity in list
-  void toggleActivity(String activity, bool isExercise) {
+  // Add this method to your existing HomePageNotifier class
+
+  // Add an exercise to the current user's exercises list
+  void addExerciseToUser(Map<String, dynamic> exerciseData) {
+    if (state.currentUser == null) return;
+
+    // Extract exercise from the API response
+    final exercise = ExerciseModel.fromJson(exerciseData);
+
+    // Create a new list with the existing exercises plus the new one
+    final updatedExercises = [...state.currentUser!.exercises, exercise];
+
+    // Create an updated user with the new exercise list
+    final updatedUser = state.currentUser!.copyWith(
+      exercises: updatedExercises,
+    );
+
+    // Update the state with the new user
+    state = state.copyWith(currentUser: updatedUser);
+
+    print(
+      'Exercise added to user: ${exercise.name}, ${exercise.durationInDays} days',
+    );
+  }
+
+  // Modify the toggleActivity method to show the bottom sheet when adding an exercise
+  void toggleActivity(
+    String activity,
+    bool isExercise, {
+    BuildContext? context,
+  }) {
     if (isExercise) {
-      // For exercises, we'll remove it if it exists or add it if not
-      final updatedExercises = List<String>.from(state.suggestedExercises);
-      if (updatedExercises.contains(activity)) {
-        updatedExercises.remove(activity);
+      // For exercises
+      if (context != null) {
+        // If context is provided, show the bottom sheet when adding
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder:
+              (context) =>
+                  AddExerciseBottomSheet(initialExerciseName: activity),
+        );
       } else {
-        updatedExercises.add(activity);
+        // If no context (for removing), just update the list
+        final updatedExercises = List<String>.from(state.suggestedExercises);
+        if (updatedExercises.contains(activity)) {
+          updatedExercises.remove(activity);
+        }
+        state = state.copyWith(suggestedExercises: updatedExercises);
       }
-      state = state.copyWith(suggestedExercises: updatedExercises);
     } else {
-      // For activities, we'll remove it if it exists or add it if not
+      // For activities, keep the existing behavior
       final updatedActivities = List<String>.from(state.suggestedActivities);
       if (updatedActivities.contains(activity)) {
         updatedActivities.remove(activity);
@@ -256,5 +304,48 @@ class HomePageNotifier extends StateNotifier<HomeState> {
       }
       state = state.copyWith(suggestedActivities: updatedActivities);
     }
+  }
+
+  // Add this method to the HomePageNotifier class
+
+  // Check if user has chat history within the last 24 hours
+  void checkMessageLimit() {
+    if (state.currentUser == null ||
+        state.currentUser!.apiChatHistory.isEmpty) {
+      // No user data or no chat history, so no limit applied yet
+      state = state.copyWith(hasReachedLimit: false);
+      return;
+    }
+
+    // Get current time
+    final now = DateTime.now();
+
+    // Check if any chat in the history is less than 24 hours old
+    bool hasRecentChat = state.currentUser!.apiChatHistory.any((chat) {
+      if (chat.createdAt == null) return false;
+
+      try {
+        // Parse the timestamp from ISO format
+        final chatTime = DateTime.parse(chat.createdAt!);
+
+        // Calculate the difference in hours
+        final difference = now.difference(chatTime).inHours;
+
+        // Return true if the chat is less than 24 hours old
+        return difference < 24;
+      } catch (e) {
+        print('Error parsing chat timestamp: $e');
+        return false;
+      }
+    });
+
+    // Update the state with the limit status
+    state = state.copyWith(
+      hasReachedLimit: hasRecentChat && state.messageCount >= _messageLimit,
+    );
+
+    print(
+      'Message limit check: hasRecentChat=$hasRecentChat, messageCount=${state.messageCount}, hasReachedLimit=${state.hasReachedLimit}',
+    );
   }
 }

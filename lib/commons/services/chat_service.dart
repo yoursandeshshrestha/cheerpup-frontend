@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:cheerpup/commons/constants/api_constants.dart';
-import 'package:cheerpup/commons/models/user_model.dart';
-import 'package:cheerpup/pages/chat_history/model/chat_message.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 

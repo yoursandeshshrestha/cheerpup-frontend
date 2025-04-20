@@ -171,26 +171,50 @@ class MoodModel {
   final String id;
   final int moodRating;
   final String mood;
+  final String createdAt;
+  final String updatedAt;
 
-  MoodModel({required this.id, required this.moodRating, required this.mood});
+  MoodModel({
+    required this.id,
+    required this.moodRating,
+    required this.mood,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
   factory MoodModel.fromJson(Map<String, dynamic> json) {
     return MoodModel(
       id: json['_id'] ?? '',
       moodRating: json['moodRating'] ?? 3,
       mood: json['mood'] ?? 'Neutral',
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'_id': id, 'moodRating': moodRating, 'mood': mood};
+    return {
+      '_id': id,
+      'moodRating': moodRating,
+      'mood': mood,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
   }
 
-  MoodModel copyWith({String? id, int? moodRating, String? mood}) {
+  MoodModel copyWith({
+    String? id,
+    int? moodRating,
+    String? mood,
+    String? createdAt,
+    String? updatedAt,
+  }) {
     return MoodModel(
       id: id ?? this.id,
       moodRating: moodRating ?? this.moodRating,
       mood: mood ?? this.mood,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
@@ -226,5 +250,52 @@ class MusicLinkModel {
       title: title ?? this.title,
       link: link ?? this.link,
     );
+  }
+}
+
+// Add these extension methods to UserModel
+
+// Extension to check if user has recent chat history
+extension UserChatExtensions on UserModel {
+  // Check if user has any chats within the last 24 hours
+  bool hasRecentChats() {
+    if (apiChatHistory.isEmpty) return false;
+
+    final now = DateTime.now();
+
+    return apiChatHistory.any((chat) {
+      if (chat.createdAt == null) return false;
+
+      try {
+        final chatTime = DateTime.parse(chat.createdAt!);
+        final difference = now.difference(chatTime).inHours;
+        return difference < 24;
+      } catch (e) {
+        print('Error parsing chat timestamp: $e');
+        return false;
+      }
+    });
+  }
+
+  // Get number of chats within the last 24 hours
+  int getRecentChatCount() {
+    if (apiChatHistory.isEmpty) return 0;
+
+    final now = DateTime.now();
+    int count = 0;
+
+    for (var chat in apiChatHistory) {
+      if (chat.createdAt == null) continue;
+
+      try {
+        final chatTime = DateTime.parse(chat.createdAt!);
+        final difference = now.difference(chatTime).inHours;
+        if (difference < 24) count++;
+      } catch (e) {
+        print('Error parsing chat timestamp: $e');
+      }
+    }
+
+    return count;
   }
 }

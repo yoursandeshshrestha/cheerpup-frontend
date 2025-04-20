@@ -1,14 +1,10 @@
 // lib/pages/activities_page/activities_page.dart
 
 import 'package:cheerpup/commons/models/user_model.dart';
-import 'package:cheerpup/pages/activities/models/activities_model.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
-
-
 
 class ActivitiesPage extends ConsumerWidget {
   const ActivitiesPage({Key? key}) : super(key: key);
@@ -16,7 +12,9 @@ class ActivitiesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Get exercises directly from our provider
-    final exercises = ref.watch(homeProvider.select((value) => value.currentUser?.exercises));
+    final exercises = ref.watch(
+      homePageProvider.select((value) => value.currentUser?.exercises),
+    );
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -25,10 +23,7 @@ class ActivitiesPage extends ConsumerWidget {
         backgroundColor: Colors.white,
         title: const Text(
           'My Activities',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
         ),
         actions: [
           IconButton(
@@ -37,35 +32,35 @@ class ActivitiesPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: exercises!.isEmpty
-          ? _buildEmptyState(context)
-          : RefreshIndicator(
-              color: Colors.teal,
-              onRefresh: () => _refreshUserData(context),
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: exercises.length,
-                itemBuilder: (context, index) {
-                  final exercise = exercises[index];
-                  return _buildExerciseCard(context, exercise);
-                },
+      body:
+          exercises!.isEmpty
+              ? _buildEmptyState(context)
+              : RefreshIndicator(
+                color: Colors.teal,
+                onRefresh: () => _refreshUserData(context),
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: exercises.length,
+                  itemBuilder: (context, index) {
+                    final exercise = exercises[index];
+                    return _buildExerciseCard(context, exercise);
+                  },
+                ),
               ),
-            ),
     );
   }
 
   Widget _buildExerciseCard(BuildContext context, ExerciseModel exercise) {
     // Determine if the exercise is completed today
-    final hasCompletedToday = exercise.streak.isNotEmpty &&
+    final hasCompletedToday =
+        exercise.streak.isNotEmpty &&
         exercise.lastUpdated != null &&
         _isToday(exercise.lastUpdated!);
 
     return Card(
       elevation: 3,
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -78,10 +73,16 @@ class ActivitiesPage extends ConsumerWidget {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: hasCompletedToday ? Colors.green.shade50 : Colors.grey.shade50,
+                    color:
+                        hasCompletedToday
+                            ? Colors.green.shade50
+                            : Colors.grey.shade50,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: hasCompletedToday ? Colors.green : Colors.grey.shade300,
+                      color:
+                          hasCompletedToday
+                              ? Colors.green
+                              : Colors.grey.shade300,
                       width: 2,
                     ),
                     boxShadow: [
@@ -94,12 +95,13 @@ class ActivitiesPage extends ConsumerWidget {
                   ),
                   child: Icon(
                     hasCompletedToday ? Icons.check : Icons.fitness_center,
-                    color: hasCompletedToday ? Colors.green : Colors.grey.shade400,
+                    color:
+                        hasCompletedToday ? Colors.green : Colors.grey.shade400,
                     size: 30,
                   ),
                 ),
                 const SizedBox(width: 20),
-                
+
                 // Exercise details
                 Expanded(
                   child: Column(
@@ -116,21 +118,18 @@ class ActivitiesPage extends ConsumerWidget {
                       const SizedBox(height: 8),
                       Text(
                         'Goal: ${exercise.durationInDays} days',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 10),
-            
+
             // Streak information
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -138,7 +137,10 @@ class ActivitiesPage extends ConsumerWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.deepOrange.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -164,31 +166,31 @@ class ActivitiesPage extends ConsumerWidget {
                     ),
                   ],
                 ),
-                
+
                 // Status text
                 hasCompletedToday
                     ? const Text(
-                        'Completed Today',
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      )
+                      'Completed Today',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
                     : OutlinedButton.icon(
-                        onPressed: () => _markAsCompleted(context, exercise),
-                        icon: const Icon(Icons.check_circle_outline),
-                        label: const Text('Mark as Done'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.teal,
-                          side: const BorderSide(color: Colors.teal),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
+                      onPressed: () => _markAsCompleted(context, exercise),
+                      icon: const Icon(Icons.check_circle_outline),
+                      label: const Text('Mark as Done'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.teal,
+                        side: const BorderSide(color: Colors.teal),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
                         ),
                       ),
+                    ),
               ],
             ),
-            
+
             if (exercise.lastUpdated != null) ...[
               const SizedBox(height: 8),
               Text(
@@ -224,7 +226,7 @@ class ActivitiesPage extends ConsumerWidget {
   Future<void> _refreshUserData(BuildContext context) async {
     // Simulate API call
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Activities refreshed'),
@@ -266,10 +268,7 @@ class ActivitiesPage extends ConsumerWidget {
           const SizedBox(height: 32),
           const Text(
             'No Activities',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           Padding(
@@ -277,10 +276,7 @@ class ActivitiesPage extends ConsumerWidget {
             child: Text(
               'Your activities will appear here',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
           ),
         ],

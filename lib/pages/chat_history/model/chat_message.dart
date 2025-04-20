@@ -8,6 +8,8 @@ class ChatHistoryModel {
   final List<String>? suggestedActivity;
   final List<MusicLinkModel> suggestedMusicLinks;
   final MusicLinkModel? suggestedMusicLink;
+  final String? createdAt;
+  final String? updatedAt;
 
   ChatHistoryModel({
     required this.id,
@@ -17,6 +19,8 @@ class ChatHistoryModel {
     this.suggestedActivity,
     required this.suggestedMusicLinks,
     this.suggestedMusicLink,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory ChatHistoryModel.fromJson(Map<String, dynamic> json) {
@@ -41,6 +45,8 @@ class ChatHistoryModel {
           json['suggestedMusicLink'] != null
               ? MusicLinkModel.fromJson(json['suggestedMusicLink'])
               : null,
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
     );
   }
 
@@ -63,6 +69,13 @@ class ChatHistoryModel {
       data['suggestedMusicLink'] = suggestedMusicLink!.toJson();
     }
 
+    if (createdAt != null) {
+      data['createdAt'] = createdAt;
+    }
+    if (updatedAt != null) {
+      data['updatedAt'] = updatedAt;
+    }
+
     return data;
   }
 
@@ -74,6 +87,8 @@ class ChatHistoryModel {
     List<String>? suggestedActivity,
     List<MusicLinkModel>? suggestedMusicLinks,
     MusicLinkModel? suggestedMusicLink,
+    String? createdAt,
+    String? updatedAt,
   }) {
     return ChatHistoryModel(
       id: id ?? this.id,
@@ -83,6 +98,8 @@ class ChatHistoryModel {
       suggestedActivity: suggestedActivity ?? this.suggestedActivity,
       suggestedMusicLinks: suggestedMusicLinks ?? this.suggestedMusicLinks,
       suggestedMusicLink: suggestedMusicLink ?? this.suggestedMusicLink,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }

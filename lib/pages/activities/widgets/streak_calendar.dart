@@ -8,11 +8,11 @@ class StreakCalendar extends StatelessWidget {
   final int maxDaysToShow;
 
   const StreakCalendar({
-    Key? key,
+    super.key,
     required this.streak,
     this.lastUpdated,
     this.maxDaysToShow = 7,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

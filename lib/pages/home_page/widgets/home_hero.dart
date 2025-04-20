@@ -18,6 +18,21 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
   final TextEditingController _messageController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+
+    // Check message limit when widget first initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkMessageLimit();
+    });
+  }
+
+  // Force refresh chat history and check message limit
+  Future<void> _checkMessageLimit() async {
+    await ref.read(homePageProvider.notifier).updateUserChatHistory();
+  }
+
+  @override
   void dispose() {
     _messageController.dispose();
     super.dispose();
@@ -79,7 +94,11 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
     );
   }
 
+  // Updated premium message widget with more informative content
   Widget _buildPremiumMessage() {
+    final user = ref.watch(homePageProvider).currentUser;
+    final recentChatCount = user?.getRecentChatCount() ?? 0;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
@@ -87,40 +106,60 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
         borderRadius: BorderRadius.circular(25),
         border: Border.all(color: Colors.amber.shade300, width: 1.5),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.star, color: Colors.amber.shade800, size: 22),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              "Upgrade to premium services to chat more",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+          Row(
+            children: [
+              Icon(
+                Icons.timer_outlined,
                 color: Colors.amber.shade800,
+                size: 22,
               ),
-            ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "Daily message limit reached",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber.shade800,
+                  ),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              // Navigate to premium upgrade page
-              // context.goNamed('premium');
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.amber.shade800,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+          const SizedBox(height: 8),
+          Text(
+            "You've sent $recentChatCount message${recentChatCount == 1 ? '' : 's'} in the last 24 hours. Free users are limited to 1 message per day.",
+            style: TextStyle(fontSize: 14, color: Colors.amber.shade900),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () {},
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.amber.shade800,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text(
+                  "Upgrade to Premium",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
               ),
-            ),
-            child: const Text(
-              "Upgrade",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-            ),
+            ],
           ),
         ],
       ),

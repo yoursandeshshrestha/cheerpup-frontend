@@ -497,7 +497,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       }
 
       // Get the image URL from the response
-      final String? imageUrl = result['data']['imageUrl'];
+      final String? imageUrl = result['data']['user']['profileImage'];
 
       if (imageUrl == null) {
         throw Exception('Image URL not found in response');
