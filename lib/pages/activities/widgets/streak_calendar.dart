@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 
+/// This widget represents a streak calendar that displays the current streak
+/// of activities. It shows the number of days in the streak and highlights
 class StreakCalendar extends StatelessWidget {
   final List<int> streak;
   final DateTime? lastUpdated;
@@ -86,6 +88,7 @@ class StreakCalendar extends StatelessWidget {
         date1.day == date2.day;
   }
 }
+/// A widget that represents a dot in the streak calendar.
 
 class _StreakDot extends StatelessWidget {
   final bool isActive;

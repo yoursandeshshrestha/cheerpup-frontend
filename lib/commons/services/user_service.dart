@@ -1,5 +1,10 @@
 // lib\commons\services\user_service.dart
-
+// This file contains the UserService class, which handles user-related API calls
+// and operations. It includes methods for creating, updating, deleting, and
+// retrieving user profiles. The service uses the http package to make network
+// requests and handles JSON encoding/decoding for the request and response data.
+// It also includes error handling for network errors and server responses.
+// Import necessary packages and constants.
 import 'dart:convert';
 import 'package:cheerpup/commons/constants/api_constants.dart';
 import 'package:cheerpup/commons/models/dto/create_user_dto.dart';

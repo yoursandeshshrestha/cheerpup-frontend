@@ -2,6 +2,7 @@ import 'package:cheerpup/pages/chat_history/model/chat_message.dart';
 import 'package:flutter/material.dart';
 import 'package:cheerpup/commons/models/user_model.dart'; // contains MusicLinkModel
 
+// This widget displays the chat details for a specific chat message.
 class ChatDetailScreen extends StatelessWidget {
   final ChatHistoryModel chat;
 
@@ -426,6 +427,7 @@ class ChatDetailScreen extends StatelessWidget {
     );
   }
 
+// Build the music link item
   Widget _buildMusicLinkItem(BuildContext context, MusicLinkModel music) {
     return InkWell(
       onTap: () {

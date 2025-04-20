@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// This file contains the HomePage widget, which is the main page of the app.
+// It displays the home screen with a hero section and content section.
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 

@@ -3,6 +3,8 @@ import 'package:cheerpup/pages/home_page/riverpod/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+
+// This file contains the ChatHistory widget, which displays the chat history of the user.
 class ChatHistory extends ConsumerWidget {
   const ChatHistory({super.key});
 

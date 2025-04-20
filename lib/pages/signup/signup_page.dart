@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+// This file contains the SignupPage widget, which is used for user signup.
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A custom button widget for the profile page.
 class ProfileWeightSlider extends StatelessWidget {
   final double value;
   final Function(double) onChanged;

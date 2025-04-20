@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A custom button widget for the profile page.
 class ProfileDropdownField extends StatelessWidget {
   final String label;
   final String value;

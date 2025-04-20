@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// A custom button widget for the profile page.
+/// It displays a label and an icon, and it can be tapped to perform an action.
 class ProfilePasswordField extends StatefulWidget {
   final String label;
   final TextEditingController controller;

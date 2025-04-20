@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cheerpup/commons/services/user_service.dart';
 import 'package:cheerpup/pages/login/riverpod/login_state.dart';
 
+// This class is a notifier for the LoginPage widget. It extends StateNotifier
+// and contains methods for logging in, clearing errors, and resetting the state.
 class LoginNotifier extends StateNotifier<LoginState> {
   final UserService _userService = UserService();
   final Ref _ref;

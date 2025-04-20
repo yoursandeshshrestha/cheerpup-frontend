@@ -1,5 +1,6 @@
 // lib/pages/signup/riverpod/signup_state.dart
 
+// This file contains the SignupState class, which represents the state of the signup process.
 class SignupState {
   final bool isLoading;
   final String? error;

@@ -1,5 +1,6 @@
 import 'package:cheerpup/commons/models/user_model.dart';
 
+//model for the message
 class Message {
   final String text;
   final bool isUserMessage;

@@ -10,6 +10,8 @@ import 'package:cheerpup/pages/signup/signup_page.dart';
 import 'package:cheerpup/pages/welcome_page/welcome_page.dart';
 import 'package:go_router/go_router.dart';
 
+// This file contains the app routes for the CheerPup application.
+// It defines the navigation structure of the app using the GoRouter package.
 final GoRouter appRouter = GoRouter(
   initialLocation: '/login',
   routes: [

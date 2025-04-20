@@ -4,6 +4,10 @@ import 'package:cheerpup/commons/models/user_model.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// This class is a notifier for the HomePage widget. It extends StateNotifier
+// and contains methods for initializing user data, updating user profile,
+// sending a message to the AI, and generating suggested activities.
+
 class HomePageNotifier extends StateNotifier<HomeState> {
   HomePageNotifier() : super(HomeState());
 

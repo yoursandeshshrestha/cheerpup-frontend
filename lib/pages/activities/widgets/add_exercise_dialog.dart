@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 
+// This widget is a dialog that allows the user to add a new exercise to their
+// list of activities. 
 class AddExerciseDialog extends StatefulWidget {
   final Function(String name, int durationInDays) onAdd;
 
@@ -205,7 +207,7 @@ class _AddExerciseDialogState extends State<AddExerciseDialog> {
       },
     );
   }
-
+  // Submit the form and call the onAdd callback with the entered data
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text.trim();

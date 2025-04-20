@@ -1,5 +1,7 @@
 // lib/pages/login/riverpod/login_state.dart
 
+// This file contains the state class for the LoginPage widget.
+// It defines the properties that represent the state of the login process.
 class LoginState {
   final bool isLoading;
   final String? error;

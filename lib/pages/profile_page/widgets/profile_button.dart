@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// This file contains the OnboardingPage widget, which is the onboarding screen of the app.
 class ProfileButton extends StatelessWidget {
   final String label;
   final IconData? icon;

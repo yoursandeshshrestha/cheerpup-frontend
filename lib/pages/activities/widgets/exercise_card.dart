@@ -4,6 +4,8 @@ import 'package:cheerpup/pages/activities/models/activities_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+/// This widget represents a card that displays information about an exercise.
+/// It includes the exercise name, goal, streak, last updated date, and action
 class ExerciseCard extends StatelessWidget {
   final Exercise exercise;
   final VoidCallback onUpdate;

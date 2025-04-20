@@ -3,6 +3,8 @@ import 'package:cheerpup/pages/home_page/riverpod/home_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// This widget is responsible for displaying the home content of the app.
+// It includes sections for AI responses, suggested activities, and suggested exercises.
 class HomeContent extends ConsumerWidget {
   const HomeContent({super.key});
 
@@ -52,6 +54,7 @@ class HomeContent extends ConsumerWidget {
     );
   }
 
+// Build the section title
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -62,6 +65,8 @@ class HomeContent extends ConsumerWidget {
       ),
     );
   }
+
+  // Build the messages section (AI responses)
 
   Widget _buildMessagesSection(BuildContext context, List<Message> messages) {
     return Column(
@@ -81,6 +86,7 @@ class HomeContent extends ConsumerWidget {
     );
   }
 
+// Build the message bubble for AI responses
   Widget _buildMessageBubble(BuildContext context, Message message) {
     // Full width container for AI responses
     return Container(
@@ -288,6 +294,7 @@ class HomeContent extends ConsumerWidget {
     );
   }
 
+// Build the action button for exercises and activities
   Widget _buildActionButton(
     BuildContext context,
     String label,

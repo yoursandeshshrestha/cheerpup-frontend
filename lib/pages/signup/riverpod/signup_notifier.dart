@@ -6,6 +6,8 @@ import 'package:cheerpup/pages/signup/riverpod/signup_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// This file contains the SignupNotifier class, which is responsible for managing the state of the signup process.
+
 class SignupNotifier extends StateNotifier<SignupState> {
   final UserService _userService = UserService();
 

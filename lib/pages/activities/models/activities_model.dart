@@ -1,4 +1,6 @@
-// This model matches the API data
+// This file contains the Exercise model, which represents an exercise
+// and its associated data. It includes properties for the exercise's ID,
+// name, duration, streak, last updated date, creation date, and update date.
 class Exercise {
   final String id;
   final String name;
@@ -18,6 +20,7 @@ class Exercise {
     this.updatedAt,
   });
 
+  // Converts the Exercise object to a JSON map.
   factory Exercise.fromJson(Map<String, dynamic> json) {
     return Exercise(
       id: json['_id'] as String,

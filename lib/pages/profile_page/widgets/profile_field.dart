@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A custom button widget for the profile page.
 class ProfileField extends StatelessWidget {
   final String label;
   final TextEditingController controller;

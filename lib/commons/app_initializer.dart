@@ -2,6 +2,10 @@ import 'package:cheerpup/commons/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// This class is responsible for initializing the app's state and providing
+// the necessary providers for the app's widgets. It uses the Riverpod library
+// to manage the app's state and provides the necessary providers for the
+// app's widgets.
 class AppInitializer extends ConsumerWidget {
   const AppInitializer({super.key});
 

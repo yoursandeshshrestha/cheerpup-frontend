@@ -203,6 +203,8 @@ class _SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
+// Chat history tile widget
+// This widget represents a single chat message in the chat history
 class ChatHistoryTile extends StatelessWidget {
   final ChatHistoryModel message;
 
@@ -365,6 +367,9 @@ class ChatHistoryTile extends StatelessWidget {
     );
   }
 
+// Build the tag widget for content types
+  // This widget is used to display tags for different content types
+  // such as exercises, activities, and music
   Widget _buildTag(
     BuildContext context,
     String label,
@@ -397,6 +402,9 @@ class ChatHistoryTile extends StatelessWidget {
     );
   }
 
+// Show chat detail popup
+  // This function is used to display a modal bottom sheet with chat details
+  // when a chat message is tapped
   void _showChatDetailPopup(BuildContext context, String chatId) {
     showModalBottomSheet(
       context: context,

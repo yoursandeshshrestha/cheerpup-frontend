@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+// This file contains the NotFound widget, which is displayed when a route is not found.
+// It provides a message indicating that the page was not found and a button to navigate to the home page.
 class NotFound extends ConsumerWidget {
   const NotFound({super.key});
 

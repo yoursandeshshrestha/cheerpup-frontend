@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 final navigationIndexProvider = StateProvider<int>((ref) => 0);
 
+/// The [LayoutPage] widget is a layout wrapper that provides a navigation bar and a child widget.
 class LayoutPage extends ConsumerWidget {
   final Widget child;
 

@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 
 
 
-
+/// This page displays the user's activities and allows them to mark exercises as completed.
 class ActivitiesPage extends ConsumerWidget {
   const ActivitiesPage({Key? key}) : super(key: key);
 
@@ -54,6 +54,7 @@ class ActivitiesPage extends ConsumerWidget {
     );
   }
 
+// Build the exercise card
   Widget _buildExerciseCard(BuildContext context, ExerciseModel exercise) {
     // Determine if the exercise is completed today
     final hasCompletedToday = exercise.streak.isNotEmpty &&

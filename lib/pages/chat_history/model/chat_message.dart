@@ -1,5 +1,8 @@
 import 'package:cheerpup/commons/models/user_model.dart';
 
+//This class represents a chat history model that contains information about the user's chat with the system.
+// It includes the user's message, the system's response, and any suggested exercises or activities.
+// It also includes a list of suggested music links and a single suggested music link.
 class ChatHistoryModel {
   final String id;
   final String userMessage;
@@ -44,6 +47,8 @@ class ChatHistoryModel {
     );
   }
 
+  // Convert the ChatHistoryModel to a JSON map.
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {
       '_id': id,
@@ -65,7 +70,7 @@ class ChatHistoryModel {
 
     return data;
   }
-
+// Convert the ChatHistoryModel to a JSON map for the server.
   ChatHistoryModel copyWith({
     String? id,
     String? userMessage,

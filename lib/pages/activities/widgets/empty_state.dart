@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+/// This widget represents the empty state of the activities page.
 class EmptyActivitiesState extends StatelessWidget {
   final VoidCallback onAddActivity;
 

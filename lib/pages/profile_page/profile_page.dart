@@ -8,6 +8,7 @@ import 'widgets/profile_field.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/profile_weight_slider.dart';
 
+// This file contains the ProfilePage widget, which is used for user profile setup.
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
@@ -54,6 +55,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     super.dispose();
   }
 
+// This method is called when the widget is built. It returns a Scaffold widget with a SafeArea.
   @override
   Widget build(BuildContext context) {
     final homeState = ref.watch(homeProvider);
@@ -225,6 +227,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
+// This method handles the form submission and updates the user profile.
   void _handleSubmit() {
     // Validate form fields
     if (_nameController.text.isEmpty || _emailController.text.isEmpty) {

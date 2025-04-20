@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+// This file contains the WelcomePage widget, which is the first screen
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
 

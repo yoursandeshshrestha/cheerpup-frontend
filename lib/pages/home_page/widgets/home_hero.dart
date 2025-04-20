@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+
+// This file contains the HomeHero widget, which is the header section of the home page.
 class HomeHero extends ConsumerStatefulWidget {
   const HomeHero({super.key});
 
@@ -32,6 +34,7 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
     _messageController.clear();
   }
 
+/// This method is called when the user taps the send button
   @override
   Widget build(BuildContext context) {
     final homeState = ref.watch(homeProvider);
@@ -71,6 +74,9 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
     );
   }
 
+  // Widget to build the date header
+  // This widget displays the current date in a formatted manner
+
   Widget _buildDateHeader(String formattedDate) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -93,6 +99,8 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
     );
   }
 
+// Widget to build the user details section
+  // This widget displays the user's profile image and name
   Widget _buildUserDetails(UserModel? user) {
     return Row(
       children: [
@@ -215,6 +223,7 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
   //   );
   // }
 
+// Widget to build the mood indicator
   Widget _buildMoodIndicator(UserModel user) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
