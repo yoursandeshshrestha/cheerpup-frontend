@@ -64,12 +64,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
 
     // If login was successful and we have a token, navigate to home
+    // In login_page.dart
     if (loginState.token != null && !loginState.isLoading) {
       print("Navigation condition met - redirecting to home");
-      // Use addPostFrameCallback to avoid build-during-build errors
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        print("Navigation condition met - redirecting to home");
-        context.goNamed("home");
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (mounted) {
+          print("Post-frame callback executing - attempting redirect to home");
+          // Add small delay to ensure auth state is updated in GoRouter
+          await Future.delayed(Duration(milliseconds: 150));
+
+          // Force a NavigatorState.pop and then navigate to home
+          if (context.mounted) {
+            print("Executing navigation to home");
+            // Use pushReplacement instead of go for more reliable navigation
+            context.go('/');
+          }
+        }
       });
     }
 

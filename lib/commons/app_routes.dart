@@ -16,13 +16,19 @@ class AppRouter {
 
   static Future<void> initialize() async {
     final authService = AuthService();
+    await authService.initialize();
     final isAuthenticated = await authService.isAuthenticated();
 
     router = GoRouter(
       initialLocation: isAuthenticated ? '/' : '/login',
       refreshListenable: authService,
       redirect: (context, state) async {
+        // Add debug logging
+        print("GoRouter.redirect - Starting redirect check");
         final isLoggedIn = await authService.isAuthenticated();
+        print(
+          "GoRouter.redirect - isLoggedIn: $isLoggedIn, path: ${state.matchedLocation}",
+        );
         final isGoingToAuth =
             state.matchedLocation == '/login' ||
             state.matchedLocation == '/signup' ||
@@ -31,11 +37,13 @@ class AppRouter {
 
         // If not logged in and trying to access protected routes
         if (!isLoggedIn && !isGoingToAuth) {
+          print("GoRouter.redirect - Not logged in, redirecting to login");
           return '/login';
         }
 
         // If logged in and trying to access auth routes
         if (isLoggedIn && isGoingToAuth) {
+          print("GoRouter.redirect - Logged in, redirecting to home");
           return '/';
         }
 

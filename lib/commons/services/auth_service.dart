@@ -74,11 +74,20 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  // Check if user is authenticated
   Future<bool> isAuthenticated() async {
     if (!_isInitialized) {
       await initialize();
     }
+
+    // Force re-read from storage - IMPORTANT
+    _token = _authBox.get(AUTH_TOKEN_KEY);
+    _userId = _authBox.get(USER_ID_KEY);
+
+    print("isAuthenticated check - memory token: $_token");
+    print(
+      "isAuthenticated check - storage token: ${_authBox.get(AUTH_TOKEN_KEY)}",
+    );
+
     return _token != null && _userId != null;
   }
 
@@ -107,11 +116,14 @@ class AuthService extends ChangeNotifier {
         final storedUserId = _authBox.get(USER_ID_KEY);
         print("Verification - Stored token: $storedToken");
         print("Verification - Stored userId: $storedUserId");
+
+        // Important: Wait a small delay to ensure Hive writes are complete
+        await Future.delayed(Duration(milliseconds: 100));
+
+        notifyListeners();
       } catch (e) {
         print("Error storing auth data: $e");
       }
-
-      notifyListeners();
     }
 
     return result;
@@ -152,22 +164,37 @@ class AuthService extends ChangeNotifier {
     return result;
   }
 
-  // Logout user and clear token
+  // In AuthService class - revised logout method
   Future<void> logout() async {
-    _token = null;
-    _userId = null;
-    _userData = null;
-
-    // Clear token from Hive
     try {
+      // Clear token from Hive first
       await _authBox.delete(AUTH_TOKEN_KEY);
       await _authBox.delete(USER_ID_KEY);
       print("Auth data cleared from Hive");
+
+      // IMPORTANT: Clear memory variables AFTER clearing storage
+      _token = null;
+      _userId = null;
+      _userData = null;
+
+      // Double-check to verify values are cleared
+      print("Memory variables cleared - token: $_token, userId: $_userId");
+
+      // Force a delay to ensure all async operations complete
+      await Future.delayed(Duration(milliseconds: 100));
+
+      // Notify listeners that auth state has changed
+      notifyListeners();
     } catch (e) {
       print("Error clearing auth data: $e");
-    }
 
-    notifyListeners();
+      // Still clear memory variables even if storage clearing fails
+      _token = null;
+      _userId = null;
+      _userData = null;
+
+      notifyListeners();
+    }
   }
 
   // Get token for API requests

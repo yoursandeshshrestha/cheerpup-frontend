@@ -219,11 +219,45 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
 
                 const SizedBox(height: 30),
-                ProfileButton(
-                  label: "Logout",
-                  onPressed: () async {
+                GestureDetector(
+                  child: Text("Logout"),
+                  onTap: () async {
+                    // final authService = ref.read(authServiceProvider);
+                    // await authService.logout();
+
+                    // // Add delay to ensure logout completes fully
+                    // await Future.delayed(Duration(milliseconds: 150));
+
+                    // if (context.mounted) {
+                    //   print("Executing navigation to login after logout");
+                    //   context.go('/login');
+                    // }
+
                     await ref.read(authServiceProvider).logout();
-                    context.goNamed('login'); // Navigate to login after logout
+
+                    // Wait to ensure the auth state change is processed
+                    await Future.delayed(Duration(milliseconds: 200));
+
+                    if (context.mounted) {
+                      // Verify the auth state before navigating
+                      final isStillLoggedIn =
+                          await ref.read(authServiceProvider).isAuthenticated();
+                      print(
+                        "Before navigation: isStillLoggedIn = $isStillLoggedIn",
+                      );
+
+                      if (!isStillLoggedIn && context.mounted) {
+                        print("Navigation to login is safe now");
+                        context.go('/login');
+                      } else {
+                        print("WARNING: Still logged in after logout attempt!");
+                        // Force a second logout attempt if still logged in
+                        await ref.read(authServiceProvider).logout();
+                        if (context.mounted) {
+                          context.go('/login');
+                        }
+                      }
+                    }
                   },
                 ),
               ],
