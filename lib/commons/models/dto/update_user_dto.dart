@@ -1,25 +1,25 @@
-// lib/models/dto/update_user_dto.dart
+// lib/commons/models/dto/update_user_dto.dart
 
 class UpdateUserDto {
   final String? name;
   final String? email;
   final String? phoneNumber;
-  final String? password;
-  final String? profileImage;
-
-  // Additional fields that could be updated
+  final int? age;
+  final String? gender;
+  final bool? isPhysicalHelpBefore;
+  final bool? isPhysicalDistress;
   final List<String>? medicines;
-  final List<String>? exercises;
   final int? seriousAlertCount;
 
   UpdateUserDto({
     this.name,
     this.email,
     this.phoneNumber,
-    this.password,
-    this.profileImage,
+    this.age,
+    this.gender,
+    this.isPhysicalHelpBefore,
+    this.isPhysicalDistress,
     this.medicines,
-    this.exercises,
     this.seriousAlertCount,
   });
 
@@ -32,12 +32,12 @@ class UpdateUserDto {
     if (name != null) data['name'] = name;
     if (email != null) data['email'] = email;
     if (phoneNumber != null) data['phoneNumber'] = phoneNumber;
-    if (password != null) data['password'] = password;
-    if (profileImage != null) data['profileImage'] = profileImage;
+    if (age != null) data['age'] = age;
+    if (gender != null) data['gender'] = gender;
+    if (isPhysicalHelpBefore != null) data['isPhysicalHelpBefore'] = isPhysicalHelpBefore;
+    if (isPhysicalDistress != null) data['isPhysicalDistress'] = isPhysicalDistress;
     if (medicines != null) data['medicines'] = medicines;
-    if (exercises != null) data['exercises'] = exercises;
-    if (seriousAlertCount != null)
-      data['seriousAlertCount'] = seriousAlertCount;
+    if (seriousAlertCount != null) data['seriousAlertCount'] = seriousAlertCount;
 
     return data;
   }
@@ -50,20 +50,22 @@ class UpdateUserDto {
     String? name,
     String? email,
     String? phoneNumber,
-    String? password,
-    String? profileImage,
+    int? age,
+    String? gender,
+    bool? isPhysicalHelpBefore,
+    bool? isPhysicalDistress,
     List<String>? medicines,
-    List<String>? exercises,
     int? seriousAlertCount,
   }) {
     return UpdateUserDto(
       name: name ?? this.name,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
-      password: password ?? this.password,
-      profileImage: profileImage ?? this.profileImage,
+      age: age ?? this.age,
+      gender: gender ?? this.gender,
+      isPhysicalHelpBefore: isPhysicalHelpBefore ?? this.isPhysicalHelpBefore,
+      isPhysicalDistress: isPhysicalDistress ?? this.isPhysicalDistress,
       medicines: medicines ?? this.medicines,
-      exercises: exercises ?? this.exercises,
       seriousAlertCount: seriousAlertCount ?? this.seriousAlertCount,
     );
   }

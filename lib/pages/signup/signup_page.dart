@@ -100,7 +100,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     if (signupState.token != null && !signupState.isLoading) {
       // Use addPostFrameCallback to avoid build-during-build errors
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed("home");
+        context.goNamed("onboarding");
       });
     }
 

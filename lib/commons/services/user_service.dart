@@ -1,10 +1,12 @@
 // lib/commons/services/user_service.dart
 
 import 'dart:convert';
+import 'dart:io';
 import 'package:cheerpup/commons/constants/api_constants.dart';
 import 'package:cheerpup/commons/models/dto/create_user_dto.dart';
 import 'package:cheerpup/commons/models/dto/login_user.dto.dart';
 import 'package:cheerpup/commons/models/dto/update_user_dto.dart';
+import 'package:cheerpup/commons/services/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -120,65 +122,94 @@ class UserService {
   }
 
   // Update user
-  Future<Map<String, dynamic>> updateUser(
-    String userId,
-    UpdateUserDto dto,
-  ) async {
+  Future<Map<String, dynamic>> updateUserProfile({
+    required String userId,
+    required UpdateUserDto updateUserDto,
+    File? profileImage,
+  }) async {
     try {
-      // Check if there are any fields to update
-      if (dto.isEmpty) {
-        return {'success': false, 'message': 'No fields to update'};
+      final authService = AuthService();
+      final token = await authService.getToken();
+
+      if (token == null) {
+        return {'success': false, 'message': 'Not authenticated'};
       }
 
-      final headers = await _getHeaders();
-      final response = await http.put(
-        Uri.parse('$_baseUrl/$userId'),
-        headers: headers,
-        body: jsonEncode(dto.toJson()),
-      );
+      // Use FormData for multipart request if there's a profile image
+      if (profileImage != null) {
+        var request = http.MultipartRequest(
+          'PUT',
+          Uri.parse('$_baseUrl/api/users/$userId'),
+        );
 
-      final responseData = jsonDecode(response.body);
+        // Add authorization header
+        request.headers['Authorization'] = 'Bearer $token';
 
-      if (response.statusCode == 200) {
-        return {'success': true, 'data': responseData};
+        // Add all fields from DTO
+        final json = updateUserDto.toJson();
+        json.forEach((key, value) {
+          if (value != null) {
+            if (value is List) {
+              // Handle array fields like medicines
+              request.fields[key] = jsonEncode(value);
+            } else {
+              request.fields[key] = value.toString();
+            }
+          }
+        });
+
+        // Add profile image if provided
+        if (profileImage.existsSync()) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'profileImage',
+              profileImage.path,
+            ),
+          );
+        }
+
+        // Send the request
+        final streamedResponse = await request.send();
+        final response = await http.Response.fromStream(streamedResponse);
+
+        return _processResponse(response);
       } else {
-        return {
-          'success': false,
-          'message': responseData['message'] ?? 'Failed to update user',
-        };
+        // Simple JSON request if no image
+        final response = await http.put(
+          Uri.parse('$_baseUrl/api/users/$userId'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: json.encode(updateUserDto.toJson()),
+        );
+
+        return _processResponse(response);
       }
     } catch (e) {
-      print("Error in updateUser: $e");
-      return {
-        'success': false,
-        'message': 'An error occurred: ${e.toString()}',
-      };
+      return {'success': false, 'message': 'Failed to connect to server: $e'};
     }
   }
 
-  // Delete user
-  Future<Map<String, dynamic>> deleteUser(String userId) async {
+  // Process HTTP response
+  Map<String, dynamic> _processResponse(http.Response response) {
     try {
-      final headers = await _getHeaders();
-      final response = await http.delete(
-        Uri.parse('$_baseUrl/$userId'),
-        headers: headers,
-      );
-
-      if (response.statusCode == 204) {
-        return {'success': true};
+      final data = json.decode(response.body);
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return {'success': true, 'data': data};
       } else {
-        final responseData = jsonDecode(response.body);
         return {
           'success': false,
-          'message': responseData['message'] ?? 'Failed to delete user',
+          'message': data['message'] ?? 'Unknown error occurred',
+          'statusCode': response.statusCode,
         };
       }
     } catch (e) {
-      print("Error in deleteUser: $e");
       return {
         'success': false,
-        'message': 'An error occurred: ${e.toString()}',
+        'message': 'Failed to process response',
+        'statusCode': response.statusCode,
       };
     }
   }

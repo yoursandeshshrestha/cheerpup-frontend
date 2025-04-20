@@ -30,25 +30,26 @@ class AppRouter {
           "GoRouter.redirect - isLoggedIn: $isLoggedIn, path: ${state.matchedLocation}",
         );
         final isGoingToAuth =
-            state.matchedLocation == '/login' ||
-            state.matchedLocation == '/signup' ||
-            state.matchedLocation == '/welcome' ||
-            state.matchedLocation == '/onboarding';
+          state.matchedLocation == '/login' ||
+          state.matchedLocation == '/signup' ||
+          state.matchedLocation == '/welcome';
 
-        // If not logged in and trying to access protected routes
-        if (!isLoggedIn && !isGoingToAuth) {
-          print("GoRouter.redirect - Not logged in, redirecting to login");
-          return '/login';
-        }
+      final isGoingToOnboarding = state.matchedLocation == '/onboarding';
 
-        // If logged in and trying to access auth routes
-        if (isLoggedIn && isGoingToAuth) {
-          print("GoRouter.redirect - Logged in, redirecting to home");
-          return '/';
-        }
+      // If not logged in and trying to access protected routes
+      if (!isLoggedIn && !isGoingToAuth && !isGoingToOnboarding) {
+        print("GoRouter.redirect - Not logged in, redirecting to login");
+        return '/login';
+      }
 
-        // No redirection needed
-        return null;
+      // If logged in and trying to access auth routes (excluding onboarding)
+      if (isLoggedIn && isGoingToAuth) {
+        print("GoRouter.redirect - Logged in, redirecting to home");
+        return '/';
+      }
+
+      // No redirection needed
+      return null;
       },
       routes: [
         ShellRoute(
