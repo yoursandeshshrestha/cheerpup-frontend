@@ -10,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 
 import 'widgets/profile_button.dart';
 import 'widgets/profile_field.dart';
-import 'widgets/profile_weight_slider.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
