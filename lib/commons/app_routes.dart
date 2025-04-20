@@ -20,7 +20,7 @@ class AppRouter {
     final isAuthenticated = await authService.isAuthenticated();
 
     router = GoRouter(
-      initialLocation: isAuthenticated ? '/' : '/login',
+      initialLocation: isAuthenticated ? '/' : '/welcome',
       refreshListenable: authService,
       redirect: (context, state) async {
         // Add debug logging
@@ -32,8 +32,7 @@ class AppRouter {
         final isGoingToAuth =
             state.matchedLocation == '/login' ||
             state.matchedLocation == '/signup' ||
-            state.matchedLocation == '/welcome' ||
-            state.matchedLocation == '/onboarding';
+            state.matchedLocation == '/welcome';
 
         // If not logged in and trying to access protected routes
         if (!isLoggedIn && !isGoingToAuth) {
