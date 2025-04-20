@@ -27,14 +27,14 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
 
-    ref.read(homeProvider.notifier).sendMessageToAI(message);
+    ref.read(homePageProvider.notifier).sendMessageToAI(message);
 
     _messageController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    final homeState = ref.watch(homeProvider);
+    final homeState = ref.watch(homePageProvider);
     final user = homeState.currentUser;
     final isLoading = homeState.isLoading;
 
@@ -129,7 +129,7 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
         color: Colors.white.withOpacity(0.2),
         border: Border.all(color: Colors.white, width: 2),
         image:
-            user?.profileImage != null
+            user?.profileImage != null && user?.profileImage!.isNotEmpty == true
                 ? DecorationImage(
                   image: NetworkImage(user!.profileImage!),
                   fit: BoxFit.cover,

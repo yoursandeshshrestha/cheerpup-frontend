@@ -37,7 +37,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     super.didChangeDependencies();
 
     // Get the user data from the provider
-    final homeState = ref.read(homeProvider);
+    final homeState = ref.read(homePageProvider);
     final user = homeState.currentUser;
 
     if (user != null) {
@@ -57,7 +57,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final homeState = ref.watch(homeProvider);
+    final homeState = ref.watch(homePageProvider);
     final user = homeState.currentUser;
     final authService = ref.read(authServiceProvider);
 
@@ -139,12 +139,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   keyboardType: TextInputType.emailAddress,
                 ),
 
-                // const SizedBox(height: 16),
-
-                // ProfilePasswordField(
-                //   label: "Password",
-                //   controller: _passwordController,
-                // ),
                 const SizedBox(height: 20),
                 const Text(
                   "Account Type",
@@ -222,17 +216,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 GestureDetector(
                   child: Text("Logout"),
                   onTap: () async {
-                    // final authService = ref.read(authServiceProvider);
-                    // await authService.logout();
-
-                    // // Add delay to ensure logout completes fully
-                    // await Future.delayed(Duration(milliseconds: 150));
-
-                    // if (context.mounted) {
-                    //   print("Executing navigation to login after logout");
-                    //   context.go('/login');
-                    // }
-
                     await ref.read(authServiceProvider).logout();
 
                     // Wait to ensure the auth state change is processed
@@ -278,7 +261,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
 
     // Update the user profile in the provider
-    final notifier = ref.read(homeProvider.notifier);
+    final notifier = ref.read(homePageProvider.notifier);
     notifier.updateUserProfile(
       name: _nameController.text,
       email: _emailController.text,

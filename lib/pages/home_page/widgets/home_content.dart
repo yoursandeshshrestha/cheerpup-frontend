@@ -8,7 +8,7 @@ class HomeContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final homeState = ref.watch(homeProvider);
+    final homeState = ref.watch(homePageProvider);
     // Filter to only show AI messages (not user messages)
     final messages =
         homeState.messages.where((msg) => !msg.isUserMessage).toList();
@@ -179,7 +179,7 @@ class HomeContent extends ConsumerWidget {
                   () {
                     // Mark as done and remove from list
                     ref
-                        .read(homeProvider.notifier)
+                        .read(homePageProvider.notifier)
                         .toggleActivity(activity, false);
                     // Could show a success message or add to completed activities
                   },
@@ -194,7 +194,7 @@ class HomeContent extends ConsumerWidget {
                   () {
                     // Remove from suggestions
                     ref
-                        .read(homeProvider.notifier)
+                        .read(homePageProvider.notifier)
                         .toggleActivity(activity, false);
                   },
                 ),
@@ -261,7 +261,7 @@ class HomeContent extends ConsumerWidget {
                   () {
                     // Add to habits
                     ref
-                        .read(homeProvider.notifier)
+                        .read(homePageProvider.notifier)
                         .toggleActivity(exercise, true);
                     // Could navigate to habits screen or show confirmation
                   },
@@ -276,7 +276,7 @@ class HomeContent extends ConsumerWidget {
                   () {
                     // Remove from suggestions
                     ref
-                        .read(homeProvider.notifier)
+                        .read(homePageProvider.notifier)
                         .toggleActivity(exercise, true);
                   },
                 ),

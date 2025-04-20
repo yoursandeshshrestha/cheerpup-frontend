@@ -14,12 +14,28 @@ class Message {
   }) : timestamp = timestamp ?? DateTime.now();
 }
 
+class Mood {
+  final String mood;
+  final int moodRating;
+
+  Mood({required this.mood, required this.moodRating});
+}
+
+class SuggestedMusic {
+  final String title;
+  final String link;
+
+  SuggestedMusic({required this.title, required this.link});
+}
+
 class HomeState {
   final UserModel? currentUser;
   final List<Message> messages;
   final bool isLoading;
   final List<String> suggestedActivities;
   final List<String> suggestedExercises;
+  final Mood? mood;
+  final SuggestedMusic? suggestedMusic;
 
   HomeState({
     this.currentUser,
@@ -27,6 +43,8 @@ class HomeState {
     this.isLoading = false,
     List<String>? suggestedActivities,
     List<String>? suggestedExercises,
+    this.mood,
+    this.suggestedMusic,
   }) : messages = messages ?? [],
        suggestedActivities = suggestedActivities ?? [],
        suggestedExercises = suggestedExercises ?? [];
@@ -38,6 +56,8 @@ class HomeState {
     bool? isLoading,
     List<String>? suggestedActivities,
     List<String>? suggestedExercises,
+    Mood? mood,
+    SuggestedMusic? suggestedMusic,
   }) {
     return HomeState(
       currentUser: currentUser ?? this.currentUser,
@@ -45,6 +65,8 @@ class HomeState {
       isLoading: isLoading ?? this.isLoading,
       suggestedActivities: suggestedActivities ?? this.suggestedActivities,
       suggestedExercises: suggestedExercises ?? this.suggestedExercises,
+      mood: mood ?? this.mood,
+      suggestedMusic: suggestedMusic ?? this.suggestedMusic,
     );
   }
 }

@@ -36,7 +36,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
         // Initialize home page state with user data
         if (userData != null) {
-          _ref.read(homeProvider.notifier).initializeUserData(userData);
+          _ref.read(homePageProvider.notifier).initializeUserData(userData);
         }
 
         // Update state with success data

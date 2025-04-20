@@ -49,7 +49,9 @@ class AppInitializer extends ConsumerWidget {
 
     // If user is authenticated, initialize home state with user data
     if (await authService.isAuthenticated() && authService.userData != null) {
-      ref.read(homeProvider.notifier).initializeUserData(authService.userData!);
+      ref
+          .read(homePageProvider.notifier)
+          .initializeUserData(authService.userData!);
     }
   }
 

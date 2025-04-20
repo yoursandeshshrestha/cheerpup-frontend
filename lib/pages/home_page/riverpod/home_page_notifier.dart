@@ -1,10 +1,11 @@
-// lib/pages/home_page/riverpod/home_page_notifier.dart
-
 import 'package:cheerpup/commons/models/user_model.dart';
+import 'package:cheerpup/commons/services/chat_service.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomePageNotifier extends StateNotifier<HomeState> {
+  final ChatService _chatService = ChatService();
+
   HomePageNotifier() : super(HomeState());
 
   // Initialize user data from login response
@@ -56,32 +57,85 @@ class HomePageNotifier extends StateNotifier<HomeState> {
 
       state = state.copyWith(messages: [...state.messages, pendingMessage]);
 
-      // Simulate API call - Replace with actual API call
-      final response = await _callAIService(messageText);
-
-      // Generate suggestions based on the message
-      final activities = _generateSuggestedActivities(messageText);
-      final exercises = _generateSuggestedExercises(messageText);
-
-      // Remove pending message and add actual response
-      final updatedMessages = [...state.messages];
-      updatedMessages.removeLast(); // Remove pending message
-
-      final aiMessage = Message(text: response, isUserMessage: false);
-
-      state = state.copyWith(
-        messages: [...updatedMessages, aiMessage],
-        isLoading: false,
-        suggestedActivities: activities,
-        suggestedExercises: exercises,
+      // Call the OpenAI service through our API
+      final apiResponse = await _chatService.chatWithOpenAI(
+        feelingText: messageText,
       );
-    } catch (e) {
-      // Handle error - remove pending message and add error message
+
+      // Remove pending message
       final updatedMessages = [...state.messages];
       updatedMessages.removeLast(); // Remove pending message
+
+      if (apiResponse['success'] == true) {
+        // Process the successful response
+        final data = apiResponse['data'];
+
+        // Extract the AI response
+        final responseText =
+            data['response'] ?? 'Sorry, I could not understand that.';
+
+        // Extract suggested activities
+        final activities = _extractSuggestedActivities(data);
+
+        // Extract suggested exercises
+        final exercises = _extractSuggestedExercises(data);
+
+        // Extract mood information
+        final moodData = data['mood'];
+        Mood? mood;
+        if (moodData != null) {
+          mood = Mood(
+            mood: moodData['mood'] ?? 'Neutral',
+            moodRating: moodData['moodRating'] ?? 5,
+          );
+        }
+
+        // Extract music suggestion
+        final musicData = data['suggestedMusicLink'];
+        SuggestedMusic? suggestedMusic;
+        if (musicData != null) {
+          suggestedMusic = SuggestedMusic(
+            title: musicData['title'] ?? 'Relaxing Music',
+            link: musicData['link'] ?? '',
+          );
+        }
+
+        // Add AI response message
+        final aiMessage = Message(text: responseText, isUserMessage: false);
+
+        // Update state with all new information
+        state = state.copyWith(
+          messages: [...updatedMessages, aiMessage],
+          isLoading: false,
+          suggestedActivities: activities,
+          suggestedExercises: exercises,
+          mood: mood,
+          suggestedMusic: suggestedMusic,
+        );
+      } else {
+        // Handle error response
+        final errorMessage = Message(
+          text:
+              apiResponse['message'] ??
+              "Sorry, I couldn't process your request. Please try again.",
+          isUserMessage: false,
+        );
+
+        state = state.copyWith(
+          messages: [...updatedMessages, errorMessage],
+          isLoading: false,
+        );
+      }
+    } catch (e) {
+      // Handle exception - remove pending message and add error message
+      final updatedMessages = [...state.messages];
+      if (updatedMessages.isNotEmpty) {
+        updatedMessages.removeLast(); // Remove pending message
+      }
 
       final errorMessage = Message(
-        text: "Sorry, I couldn't process your request. Please try again.",
+        text:
+            "Sorry, I couldn't connect to the service. Please check your connection and try again.",
         isUserMessage: false,
       );
 
@@ -92,59 +146,30 @@ class HomePageNotifier extends StateNotifier<HomeState> {
     }
   }
 
-  // Mock AI service call - replace with actual implementation
-  Future<String> _callAIService(String message) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 2));
-
-    // Mock response based on user message
-    if (message.toLowerCase().contains('exercise') ||
-        message.toLowerCase().contains('workout')) {
-      return "I recommend starting with light exercises like walking or stretching. What are your fitness goals?";
-    } else if (message.toLowerCase().contains('sad') ||
-        message.toLowerCase().contains('depress')) {
-      return "I'm sorry to hear you're feeling down. Would you like to try some mood-boosting activities?";
-    } else if (message.toLowerCase().contains('happy') ||
-        message.toLowerCase().contains('good')) {
-      return "That's great! Let's keep that positive energy going with some fulfilling activities!";
-    } else {
-      return "Thanks for sharing! How are you feeling today? I can suggest some activities to help with your well-being.";
+  // Extract suggested activities from API response
+  List<String> _extractSuggestedActivities(Map<String, dynamic> data) {
+    try {
+      final activities = data['suggestedActivity'];
+      if (activities is List) {
+        return List<String>.from(activities);
+      }
+    } catch (e) {
+      print('Error extracting suggested activities: $e');
     }
+    return [];
   }
 
-  // Generate suggested activities based on message content
-  List<String> _generateSuggestedActivities(String message) {
-    // This would typically come from your AI service in a real app
-    // For now, we'll return mock data based on message content
-    if (message.toLowerCase().contains('stress') ||
-        message.toLowerCase().contains('anxious')) {
-      return [
-        'Deep Breathing: 5-minute breathing exercise to reduce stress',
-        'Nature Walk: Take a 15-minute walk in a park or natural setting',
-      ];
-    } else if (message.toLowerCase().contains('sleep') ||
-        message.toLowerCase().contains('tired')) {
-      return [
-        'Bedtime Routine: Create a calming pre-sleep ritual',
-        'Screen-Free Hour: Avoid screens 1 hour before bed',
-      ];
-    } else {
-      return state.suggestedActivities; // Keep existing suggestions
+  // Extract suggested exercises from API response
+  List<String> _extractSuggestedExercises(Map<String, dynamic> data) {
+    try {
+      final exercises = data['suggestedExercise'];
+      if (exercises is List) {
+        return List<String>.from(exercises);
+      }
+    } catch (e) {
+      print('Error extracting suggested exercises: $e');
     }
-  }
-
-  // Generate suggested exercises based on message content
-  List<String> _generateSuggestedExercises(String message) {
-    // This would typically come from your AI service in a real app
-    if (message.toLowerCase().contains('fitness') ||
-        message.toLowerCase().contains('exercise')) {
-      return [
-        'Morning Stretches: 10-minute full-body stretch routine',
-        'Quick HIIT: 7-minute high-intensity interval training',
-      ];
-    } else {
-      return state.suggestedExercises; // Keep existing suggestions
-    }
+    return [];
   }
 
   // Toggle activity in list
