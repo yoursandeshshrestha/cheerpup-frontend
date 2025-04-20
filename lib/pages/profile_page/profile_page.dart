@@ -1,13 +1,15 @@
+import 'package:cheerpup/commons/models/dto/update_user_dto.dart';
 import 'package:cheerpup/commons/services/auth_service.dart';
+import 'package:cheerpup/commons/services/user_service.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_provider.dart';
 import 'package:cheerpup/pages/layout/layout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'widgets/profile_button.dart';
 import 'widgets/profile_field.dart';
-import 'widgets/profile_header.dart';
 import 'widgets/profile_weight_slider.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
@@ -66,6 +68,104 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void _unfocusAll() {
     _nameFocusNode.unfocus();
     _emailFocusNode.unfocus();
+  }
+
+  Future<void> _handleSubmit() async {
+    // Unfocus all fields
+    _unfocusAll();
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Validate form fields
+    if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all required fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      // Get the current user from the provider
+      final homeState = ref.read(homePageProvider);
+      final user = homeState.currentUser;
+
+      if (user == null) {
+        throw Exception('User not found');
+      }
+
+      // Create UpdateUserDto with the new values
+      final updateUserDto = UpdateUserDto(
+        name: _nameController.text != user.name ? _nameController.text : null,
+        email:
+            _emailController.text != user.email ? _emailController.text : null,
+        weight: _weightValue != user.weight ? _weightValue.toInt() : null,
+        // Add other fields as needed
+      );
+
+      // Only call the API if there are changes
+      if (!updateUserDto.isEmpty) {
+        // Get an instance of UserService
+        final userService = UserService();
+
+        // Call the API to update the user
+        final result = await userService.updateUser(
+          user.id, // Assuming user.id contains the user ID
+          updateUserDto,
+        );
+
+        if (!result['success']) {
+          throw Exception(result['message'] ?? 'Failed to update profile');
+        }
+      }
+
+      // Update the user profile in the provider
+      final notifier = ref.read(homePageProvider.notifier);
+      notifier.updateUserProfile(
+        name: _nameController.text,
+        email: _emailController.text,
+        weight: _weightValue,
+      );
+
+      // Show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile updated successfully'),
+            backgroundColor: Color(0xFF5D4037),
+          ),
+        );
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Navigate back to the home screen
+        context.go('/');
+        ref.read(navigationIndexProvider.notifier).state = 0;
+      }
+    } catch (e) {
+      if (mounted) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error updating profile: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -195,30 +295,34 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             Positioned(
                               bottom: 0,
                               right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      const Color(0xFF5D4037),
-                                      const Color(0xFF8D6E63),
+                              child: GestureDetector(
+                                onTap:
+                                    _handleImageUpload, // Add this onTap handler
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        const Color(0xFF5D4037),
+                                        const Color(0xFF8D6E63),
+                                      ],
+                                    ),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
                                     ],
                                   ),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.white,
-                                  size: 18,
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
                                 ),
                               ),
                             ),
@@ -245,19 +349,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         focusNode: _emailFocusNode,
                       ),
 
-                      const SizedBox(height: 20),
+                      // const SizedBox(height: 20),
 
-                      ProfileWeightSlider(
-                        value: _weightValue,
-                        onChanged: (value) {
-                          setState(() {
-                            _weightValue = value;
-                          });
-                        },
-                        min: 30,
-                        max: 150,
-                      ),
-
+                      // ProfileWeightSlider(
+                      //   value: _weightValue,
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       _weightValue = value;
+                      //     });
+                      //   },
+                      //   min: 30,
+                      //   max: 150,
+                      // ),
                       const SizedBox(height: 30),
                       ProfileButton(
                         label: "Save Changes",
@@ -361,54 +464,74 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
   }
 
-  void _handleSubmit() {
-    // Unfocus all fields
-    _unfocusAll();
+  Future<void> _handleImageUpload() async {
+    final ImagePicker picker = ImagePicker();
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Validate form fields
-    if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all required fields'),
-          backgroundColor: Colors.red,
-        ),
+    try {
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 80,
       );
+
+      if (image == null) return; // User canceled the picker
+
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
-      return;
-    }
 
-    // Simulate network delay
-    Future.delayed(const Duration(milliseconds: 800), () {
+      // Get user from provider
+      final homeState = ref.read(homePageProvider);
+      final user = homeState.currentUser;
+
+      if (user == null) {
+        throw Exception('User not found');
+      }
+
+      // Upload the image
+      final userService = UserService();
+      final result = await userService.uploadProfileImage(user.id, image.path);
+
+      if (!result['success']) {
+        throw Exception(result['message'] ?? 'Failed to upload image');
+      }
+
+      // Get the image URL from the response
+      final String? imageUrl = result['data']['imageUrl'];
+
+      if (imageUrl == null) {
+        throw Exception('Image URL not found in response');
+      }
+
+      // Update the user profile in the provider
+      final notifier = ref.read(homePageProvider.notifier);
+      notifier.updateUserProfileImage(imageUrl);
+
+      // Show success message
       if (mounted) {
-        // Update the user profile in the provider
-        final notifier = ref.read(homePageProvider.notifier);
-        notifier.updateUserProfile(
-          name: _nameController.text,
-          email: _emailController.text,
-          weight: _weightValue,
-        );
-
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Profile updated successfully'),
+            content: Text('Profile image updated successfully'),
             backgroundColor: Color(0xFF5D4037),
           ),
         );
-
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error uploading image: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
         setState(() {
           _isLoading = false;
         });
-
-        // Navigate back to the home screen
-        context.go('/');
       }
-    });
+    }
   }
 }

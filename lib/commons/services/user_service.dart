@@ -132,7 +132,7 @@ class UserService {
 
       final headers = await _getHeaders();
       final response = await http.put(
-        Uri.parse('$_baseUrl/$userId'),
+        Uri.parse('$_baseUrl/user/$userId'),
         headers: headers,
         body: jsonEncode(dto.toJson()),
       );
@@ -156,26 +156,46 @@ class UserService {
     }
   }
 
-  // Delete user
-  Future<Map<String, dynamic>> deleteUser(String userId) async {
+  // Add this method to your UserService class
+
+  // Upload profile image
+  Future<Map<String, dynamic>> uploadProfileImage(
+    String userId,
+    String imagePath,
+  ) async {
     try {
       final headers = await _getHeaders();
-      final response = await http.delete(
-        Uri.parse('$_baseUrl/$userId'),
-        headers: headers,
+
+      // Create a multipart request
+      var request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('$_baseUrl/user/$userId'),
       );
 
-      if (response.statusCode == 204) {
-        return {'success': true};
+      // Add the auth headers
+      headers.forEach((key, value) {
+        request.headers[key] = value;
+      });
+
+      // Add the file
+      request.files.add(await http.MultipartFile.fromPath('file', imagePath));
+
+      // Send the request
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': responseData};
       } else {
-        final responseData = jsonDecode(response.body);
         return {
           'success': false,
-          'message': responseData['message'] ?? 'Failed to delete user',
+          'message': responseData['message'] ?? 'Failed to upload image',
         };
       }
     } catch (e) {
-      print("Error in deleteUser: $e");
+      print("Error in uploadProfileImage: $e");
       return {
         'success': false,
         'message': 'An error occurred: ${e.toString()}',

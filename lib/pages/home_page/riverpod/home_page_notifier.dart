@@ -25,6 +25,16 @@ class HomePageNotifier extends StateNotifier<HomeState> {
     }
   }
 
+  void updateUserProfileImage(String imageUrl) {
+    if (state.currentUser == null) return;
+
+    // Create a new user object with the updated image URL
+    final updatedUser = state.currentUser!.copyWith(profileImage: imageUrl);
+
+    // Update the state with the new user
+    state = state.copyWith(currentUser: updatedUser);
+  }
+
   // Update user profile
   void updateUserProfile({
     String? name,

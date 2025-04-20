@@ -6,6 +6,7 @@ class UpdateUserDto {
   final String? phoneNumber;
   final String? password;
   final String? profileImage;
+  final int? weight;
 
   // Additional fields that could be updated
   final List<String>? medicines;
@@ -21,6 +22,7 @@ class UpdateUserDto {
     this.medicines,
     this.exercises,
     this.seriousAlertCount,
+    this.weight,
   });
 
   /// Converts DTO to JSON map for API request
@@ -38,6 +40,7 @@ class UpdateUserDto {
     if (exercises != null) data['exercises'] = exercises;
     if (seriousAlertCount != null)
       data['seriousAlertCount'] = seriousAlertCount;
+    if (weight != null) data['weight'] = weight;
 
     return data;
   }
@@ -55,6 +58,7 @@ class UpdateUserDto {
     List<String>? medicines,
     List<String>? exercises,
     int? seriousAlertCount,
+    int? weight,
   }) {
     return UpdateUserDto(
       name: name ?? this.name,
@@ -65,6 +69,7 @@ class UpdateUserDto {
       medicines: medicines ?? this.medicines,
       exercises: exercises ?? this.exercises,
       seriousAlertCount: seriousAlertCount ?? this.seriousAlertCount,
+      weight: weight ?? this.weight,
     );
   }
 }
