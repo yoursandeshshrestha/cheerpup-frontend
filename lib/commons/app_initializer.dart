@@ -27,6 +27,12 @@ class AppInitializer extends ConsumerWidget {
           // Show a loading indicator while initializing
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const MaterialApp(
+              debugShowCheckedModeBanner: false, // turn off the banner
+              showPerformanceOverlay: false, // turn off perf overlay
+              checkerboardRasterCacheImages: false, // no checkerboarding
+              checkerboardOffscreenLayers: false,
+              debugShowMaterialGrid: false,
+              showSemanticsDebugger: false,
               home: Scaffold(body: Center(child: CircularProgressIndicator())),
             );
           }
@@ -66,6 +72,11 @@ class AppInitializer extends ConsumerWidget {
       ),
       routerConfig: AppRouter.router,
       debugShowCheckedModeBanner: false,
+      showPerformanceOverlay: false,
+      checkerboardRasterCacheImages: false,
+      checkerboardOffscreenLayers: false,
+      debugShowMaterialGrid: false,
+      showSemanticsDebugger: false,
     );
   }
 }
