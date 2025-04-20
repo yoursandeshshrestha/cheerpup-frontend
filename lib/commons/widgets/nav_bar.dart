@@ -63,7 +63,7 @@ class NavBar extends ConsumerWidget {
     int selectedIndex,
   ) {
     final isSelected = index == selectedIndex;
-    final color = isSelected ? const Color(0xFF8DAF5D) : Colors.grey;
+    final color = isSelected ? Colors.indigo.shade900 : Colors.grey;
 
     return InkWell(
       onTap: () => onItemTapped(index),

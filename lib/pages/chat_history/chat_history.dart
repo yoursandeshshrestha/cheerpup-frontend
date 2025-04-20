@@ -9,7 +9,7 @@ class ChatHistory extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homePageProvider);
-    final messages = homeState.currentUser!.apiChatHistory;
+    final messages = homeState.currentUser!.apiChatHistory.reversed.toList();
 
     return ListView.builder(
       itemCount: messages.length,

@@ -9,19 +9,29 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Set status bar style
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        // statusBarColor: Color(0xFF694E3E),
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
       ),
     );
 
-    return Column(
-      children: [
-        const HomeHero(),
-        Expanded(child: SingleChildScrollView(child: HomeContent())),
-      ],
+    return Scaffold(
+      backgroundColor: Colors.grey.shade50,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const HomeHero(),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: HomeContent(),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

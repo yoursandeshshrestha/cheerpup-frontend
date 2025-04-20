@@ -24,6 +24,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   final _confirmPasswordFocusNode = FocusNode();
 
   bool _passwordsMatch = true;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -105,8 +107,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.grey.shade50, // Match HomeContent background
+      resizeToAvoidBottomInset: true,
       body: GestureDetector(
         onTap: _unfocusAll,
         child: SafeArea(
@@ -117,9 +119,16 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 Container(
                   width: double.infinity,
                   height: 200,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFA9BC7D),
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        const Color(0xFF5D4037), // Dark brown from HomeContent
+                        const Color(0xFF8D6E63), // Lighter brown variant
+                      ],
+                    ),
+                    borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(90),
                       bottomRight: Radius.circular(90),
                     ),
@@ -127,25 +136,32 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                   child: Center(
                     child: Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: const Icon(
                         Icons.plus_one,
-                        color: Color(0xFFA9BC7D),
+                        color: Color(0xFF5D4037), // Match header gradient
                         size: 30,
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 40),
-                const Text(
+                Text(
                   'Sign up to Cheerpup',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF4A3728),
+                    color: const Color(0xFF5D4037), // Match HomeContent text
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -157,21 +173,34 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Name field
-                      const Text(
+                      Text(
                         'Full Name',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF4A3728),
+                          color: const Color(
+                            0xFF5D4037,
+                          ), // Match HomeContent text
                         ),
                       ),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(
+                            16,
+                          ), // Rounder corners like HomeContent
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                           border: Border.all(
-                            color: const Color(0xFFA9BC7D),
+                            color: const Color(
+                              0xFFEADDD7,
+                            ), // Light border from HomeContent
                             width: 1,
                           ),
                         ),
@@ -189,7 +218,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                             hintStyle: TextStyle(color: Colors.grey),
                             prefixIcon: Icon(
                               Icons.person_outline,
-                              color: Color(0xFF4A3728),
+                              color: Color(
+                                0xFF5D4037,
+                              ), // Match HomeContent icons
                             ),
                           ),
                         ),
@@ -198,21 +229,30 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                       const SizedBox(height: 20),
 
                       // Email field
-                      const Text(
+                      Text(
                         'Email',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF4A3728),
+                          color: const Color(
+                            0xFF5D4037,
+                          ), // Match HomeContent text
                         ),
                       ),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                           border: Border.all(
-                            color: const Color(0xFFA9BC7D),
+                            color: const Color(0xFFEADDD7),
                             width: 1,
                           ),
                         ),
@@ -231,7 +271,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                             hintStyle: TextStyle(color: Colors.grey),
                             prefixIcon: Icon(
                               Icons.email_outlined,
-                              color: Color(0xFF4A3728),
+                              color: Color(0xFF5D4037),
                             ),
                           ),
                         ),
@@ -240,21 +280,28 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                       const SizedBox(height: 20),
 
                       // Phone field
-                      const Text(
+                      Text(
                         'Phone Number',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF4A3728),
+                          color: const Color(0xFF5D4037),
                         ),
                       ),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                           border: Border.all(
-                            color: const Color(0xFFA9BC7D),
+                            color: const Color(0xFFEADDD7),
                             width: 1,
                           ),
                         ),
@@ -273,7 +320,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                             hintStyle: TextStyle(color: Colors.grey),
                             prefixIcon: Icon(
                               Icons.phone_outlined,
-                              color: Color(0xFF4A3728),
+                              color: Color(0xFF5D4037),
                             ),
                           ),
                         ),
@@ -282,28 +329,35 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                       const SizedBox(height: 20),
 
                       // Password field
-                      const Text(
+                      Text(
                         'Password',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF4A3728),
+                          color: const Color(0xFF5D4037),
                         ),
                       ),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                           border: Border.all(
-                            color: const Color(0xFFA9BC7D),
+                            color: const Color(0xFFEADDD7),
                             width: 1,
                           ),
                         ),
                         child: TextField(
                           controller: _passwordController,
                           focusNode: _passwordFocusNode,
-                          obscureText: true,
+                          obscureText: _obscurePassword,
                           onTapOutside: (_) => _passwordFocusNode.unfocus(),
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(
@@ -315,41 +369,51 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                             hintStyle: const TextStyle(color: Colors.grey),
                             prefixIcon: const Icon(
                               Icons.lock_outline,
-                              color: Color(0xFF4A3728),
+                              color: Color(0xFF5D4037),
                             ),
                             suffixIcon: IconButton(
-                              icon: const Icon(
-                                Icons.visibility_outlined,
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
                                 color: Colors.grey,
                               ),
                               onPressed: () {
-                                // password visibility toggle (optional)
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
                               },
                             ),
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 20),
 
                       // Confirm password
-                      const Text(
+                      Text(
                         'Confirm password',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF4A3728),
+                          color: const Color(0xFF5D4037),
                         ),
                       ),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                           border: Border.all(
                             color:
                                 _passwordsMatch
-                                    ? const Color(0xFFA9BC7D)
+                                    ? const Color(0xFFEADDD7)
                                     : Colors.red,
                             width: 1,
                           ),
@@ -357,7 +421,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         child: TextField(
                           controller: _confirmPasswordController,
                           focusNode: _confirmPasswordFocusNode,
-                          obscureText: true,
+                          obscureText: _obscureConfirmPassword,
                           onTapOutside:
                               (_) => _confirmPasswordFocusNode.unfocus(),
                           decoration: InputDecoration(
@@ -370,15 +434,20 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                             hintStyle: const TextStyle(color: Colors.grey),
                             prefixIcon: const Icon(
                               Icons.lock_outline,
-                              color: Color(0xFF4A3728),
+                              color: Color(0xFF5D4037),
                             ),
                             suffixIcon: IconButton(
-                              icon: const Icon(
-                                Icons.visibility_outlined,
+                              icon: Icon(
+                                _obscureConfirmPassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
                                 color: Colors.grey,
                               ),
                               onPressed: () {
-                                // password visibility toggle (optional)
+                                setState(() {
+                                  _obscureConfirmPassword =
+                                      !_obscureConfirmPassword;
+                                });
                               },
                             ),
                           ),
@@ -407,11 +476,24 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                       width: double.infinity,
                       height: 55,
                       decoration: BoxDecoration(
-                        color:
-                            signupState.isLoading
-                                ? Colors.grey
-                                : const Color(0xFF4A3728),
-                        borderRadius: BorderRadius.circular(50),
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(
+                              0xFF5D4037,
+                            ), // Dark brown from HomeContent
+                            const Color(0xFF8D6E63), // Lighter brown variant
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF5D4037).withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Center(
                         child:
@@ -455,24 +537,26 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     ),
                   ),
 
-                const SizedBox(height: 30),
-
-                // --- Already have an account ---
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       "Already have an account? ",
-                      style: TextStyle(color: Color(0xFF4A3728), fontSize: 14),
+                      style: TextStyle(
+                        color: const Color(0xFF5D4037),
+                        fontSize: 14,
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
                         context.replaceNamed('login');
                       },
-                      child: const Text(
+                      child: Text(
                         'Sign in',
                         style: TextStyle(
-                          color: Color(0xFFFF9500),
+                          color: const Color(
+                            0xFF1565C0,
+                          ), // Blue from HomeContent
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),

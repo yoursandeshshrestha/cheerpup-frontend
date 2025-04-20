@@ -1,10 +1,12 @@
 import 'package:cheerpup/commons/models/user_model.dart';
 import 'package:cheerpup/commons/services/chat_service.dart';
+import 'package:cheerpup/pages/chat_history/model/chat_message.dart';
 import 'package:cheerpup/pages/home_page/riverpod/home_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomePageNotifier extends StateNotifier<HomeState> {
   final ChatService _chatService = ChatService();
+  final int _messageLimit = 1; // Set the message limit to 1
 
   HomePageNotifier() : super(HomeState());
 
@@ -40,11 +42,18 @@ class HomePageNotifier extends StateNotifier<HomeState> {
   Future<void> sendMessageToAI(String messageText) async {
     if (messageText.trim().isEmpty) return;
 
+    // Check if user has reached message limit
+    if (state.messageCount >= _messageLimit) {
+      state = state.copyWith(hasReachedLimit: true);
+      return;
+    }
+
     // Add user message
     final userMessage = Message(text: messageText, isUserMessage: true);
     state = state.copyWith(
       messages: [...state.messages, userMessage],
       isLoading: true,
+      messageCount: state.messageCount + 1, // Increment message count
     );
 
     try {
@@ -111,7 +120,11 @@ class HomePageNotifier extends StateNotifier<HomeState> {
           suggestedExercises: exercises,
           mood: mood,
           suggestedMusic: suggestedMusic,
+          hasReachedLimit: state.messageCount >= _messageLimit,
         );
+
+        // Fetch updated user chat history
+        _updateUserChatHistory();
       } else {
         // Handle error response
         final errorMessage = Message(
@@ -124,6 +137,7 @@ class HomePageNotifier extends StateNotifier<HomeState> {
         state = state.copyWith(
           messages: [...updatedMessages, errorMessage],
           isLoading: false,
+          hasReachedLimit: state.messageCount >= _messageLimit,
         );
       }
     } catch (e) {
@@ -142,7 +156,46 @@ class HomePageNotifier extends StateNotifier<HomeState> {
       state = state.copyWith(
         messages: [...updatedMessages, errorMessage],
         isLoading: false,
+        hasReachedLimit: state.messageCount >= _messageLimit,
       );
+    }
+  }
+
+  // Fetch and update user chat history
+  Future<void> _updateUserChatHistory() async {
+    try {
+      // Fetch the chat history
+      final response = await _chatService.getUserChatHistory();
+
+      if (response['success'] == true && response['data'] != null) {
+        final chatData = response['data'];
+
+        if (chatData['chatHistory'] != null) {
+          // Convert the chat history JSON to ChatHistoryModel list
+          final chatHistory =
+              (chatData['chatHistory'] as List<dynamic>)
+                  .map((chat) => ChatHistoryModel.fromJson(chat))
+                  .toList();
+
+          // Update the current user with the new chat history
+          if (state.currentUser != null) {
+            final updatedUser = state.currentUser!.copyWith(
+              apiChatHistory: chatHistory,
+            );
+
+            // Update state with the updated user
+            state = state.copyWith(currentUser: updatedUser);
+
+            print(
+              'Chat history updated successfully with ${chatHistory.length} items',
+            );
+          }
+        }
+      } else {
+        print('Failed to update chat history: ${response['message']}');
+      }
+    } catch (e) {
+      print('Error updating chat history: $e');
     }
   }
 

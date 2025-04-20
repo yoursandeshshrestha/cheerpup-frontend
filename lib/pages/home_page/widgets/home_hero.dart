@@ -37,6 +37,7 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
     final homeState = ref.watch(homePageProvider);
     final user = homeState.currentUser;
     final isLoading = homeState.isLoading;
+    final hasReachedLimit = homeState.hasReachedLimit;
 
     final now = DateTime.now();
     final dateFormat = DateFormat('EEE, dd MMM yyyy');
@@ -44,8 +45,12 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
-      decoration: const BoxDecoration(
-        color: Color(0xFF694E3E),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.indigo.shade900, Colors.indigo.shade700],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ), // Darker brown color
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(40),
           bottomRight: Radius.circular(40),
@@ -65,7 +70,58 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
             },
           ),
           const SizedBox(height: 16),
-          _buildInputField(isLoading),
+          // Show either the input field or premium message based on limit
+          hasReachedLimit
+              ? _buildPremiumMessage()
+              : _buildInputField(isLoading),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPremiumMessage() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade100,
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: Colors.amber.shade300, width: 1.5),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.star, color: Colors.amber.shade800, size: 22),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              "Upgrade to premium services to chat more",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.amber.shade800,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              // Navigate to premium upgrade page
+              // context.goNamed('premium');
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.amber.shade800,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: const Text(
+              "Upgrade",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -149,71 +205,11 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
   Widget _buildUserStats(UserModel? user) {
     return Row(
       children: [
-        // Pro badge - show only if user is subscribed
-        // if (user?.isSubscribed == true) ...[
-        //   _buildProBadge(),
-        //   const SizedBox(width: 8),
-        // ],
-
-        // Progress indicator
-        // if (user != null) _buildProgressIndicator(user),
-        const SizedBox(width: 8),
-
         // Mood indicator
         if (user != null && user.moods.isNotEmpty) _buildMoodIndicator(user),
       ],
     );
   }
-
-  // Widget to build the Pro badge
-  // Widget _buildProBadge() {
-  //   return Container(
-  //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-  //     decoration: BoxDecoration(
-  //       color: Colors.green,
-  //       borderRadius: BorderRadius.circular(12),
-  //     ),
-  //     child: const Row(
-  //       children: [
-  //         Icon(Icons.star, color: Colors.white, size: 14),
-  //         SizedBox(width: 4),
-  //         Text(
-  //           'Pro',
-  //           style: TextStyle(
-  //             color: Colors.white,
-  //             fontSize: 12,
-  //             fontWeight: FontWeight.w500,
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // Widget to build the progress indicator
-  // Widget _buildProgressIndicator(UserModel user) {
-  //   return Container(
-  //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-  //     decoration: BoxDecoration(
-  //       color: Colors.orange,
-  //       borderRadius: BorderRadius.circular(12),
-  //     ),
-  //     child: Row(
-  //       children: [
-  //         const Icon(Icons.auto_awesome, color: Colors.white, size: 14),
-  //         const SizedBox(width: 4),
-  //         Text(
-  //           '${user.progressPercentage.toInt()}%',
-  //           style: const TextStyle(
-  //             color: Colors.white,
-  //             fontSize: 12,
-  //             fontWeight: FontWeight.w500,
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildMoodIndicator(UserModel user) {
     return Container(
@@ -246,6 +242,13 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -268,12 +271,14 @@ class _HomeHeroState extends ConsumerState<HomeHero> {
           GestureDetector(
             onTap: isLoading ? null : _handleSendMessage,
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
-
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Icon(
                 Icons.send,
                 size: 24,
-                color: isLoading ? Colors.grey.withOpacity(0.5) : Colors.grey,
+                color:
+                    isLoading
+                        ? Colors.grey.withOpacity(0.5)
+                        : const Color(0xFF5D4037),
               ),
             ),
           ),

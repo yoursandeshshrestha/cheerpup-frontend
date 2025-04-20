@@ -4,12 +4,9 @@ import 'package:cheerpup/commons/models/user_model.dart'; // contains MusicLinkM
 
 class ChatDetailScreen extends StatelessWidget {
   final ChatHistoryModel chat;
+  final String chatId;
 
-  const ChatDetailScreen({
-    super.key,
-    required this.chat,
-    required String chatId,
-  });
+  const ChatDetailScreen({super.key, required this.chat, required this.chatId});
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +92,9 @@ class ChatDetailScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
-                        chat.userMessage,
+                        chat.userMessage.isNotEmpty
+                            ? chat.userMessage
+                            : "No message",
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ),
@@ -112,7 +111,9 @@ class ChatDetailScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
-                        chat.systemMessage,
+                        chat.systemMessage.isNotEmpty
+                            ? chat.systemMessage
+                            : "No system message",
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ),
@@ -227,7 +228,10 @@ class ChatDetailScreen extends StatelessWidget {
                   ],
 
                   // Suggested music links
-                  if (chat.suggestedMusicLinks.isNotEmpty) ...[
+                  if (chat.suggestedMusicLinks.isNotEmpty &&
+                      chat.suggestedMusicLinks.any(
+                        (link) => link.link != null,
+                      )) ...[
                     const SizedBox(height: 16),
                     _buildSectionCard(
                       context,
@@ -239,12 +243,19 @@ class ChatDetailScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children:
-                              chat.suggestedMusicLinks.map((m) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12.0),
-                                  child: _buildMusicLinkItem(context, m),
-                                );
-                              }).toList(),
+                              chat.suggestedMusicLinks
+                                  .where(
+                                    (link) => link.link != null,
+                                  ) // Only include links that are not null
+                                  .map((m) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 12.0,
+                                      ),
+                                      child: _buildMusicLinkItem(context, m),
+                                    );
+                                  })
+                                  .toList(),
                         ),
                       ),
                     ),
@@ -308,10 +319,16 @@ class ChatDetailScreen extends StatelessWidget {
                                     const SizedBox(height: 4),
                                     InkWell(
                                       onTap: () {
-                                        // Open URL
+                                        // Handle null link safely
+                                        if (chat.suggestedMusicLink?.link !=
+                                            null) {
+                                          // Open URL
+                                        }
                                       },
                                       child: Text(
-                                        chat.suggestedMusicLink!.link.toString(),
+                                        chat.suggestedMusicLink?.link
+                                                ?.toString() ??
+                                            "No link available",
                                         style: const TextStyle(
                                           color: Colors.deepPurple,
                                           fontWeight: FontWeight.bold,
@@ -322,11 +339,12 @@ class ChatDetailScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              const Icon(
-                                Icons.open_in_new,
-                                color: Colors.deepPurple,
-                                size: 20,
-                              ),
+                              if (chat.suggestedMusicLink?.link != null)
+                                const Icon(
+                                  Icons.open_in_new,
+                                  color: Colors.deepPurple,
+                                  size: 20,
+                                ),
                             ],
                           ),
                         ),
@@ -429,7 +447,10 @@ class ChatDetailScreen extends StatelessWidget {
   Widget _buildMusicLinkItem(BuildContext context, MusicLinkModel music) {
     return InkWell(
       onTap: () {
-        // Open URL
+        // Only handle tap if link is not null
+        if (music.link != null) {
+          // Open URL
+        }
       },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -452,7 +473,7 @@ class ChatDetailScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  music.link.toString(),
+                  music.link?.toString() ?? "No link available",
                   style: TextStyle(
                     color: Colors.blue.shade700,
                     fontWeight: FontWeight.w500,
@@ -468,7 +489,8 @@ class ChatDetailScreen extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.open_in_new, color: Colors.grey, size: 16),
+          if (music.link != null)
+            const Icon(Icons.open_in_new, color: Colors.grey, size: 16),
         ],
       ),
     );

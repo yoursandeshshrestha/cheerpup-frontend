@@ -33,3 +33,7 @@ final userMoodProvider = Provider<Mood?>((ref) {
 final suggestedMusicProvider = Provider<SuggestedMusic?>((ref) {
   return ref.watch(homePageProvider).suggestedMusic;
 });
+
+final hasReachedLimitProvider = Provider<bool>((ref) {
+  return ref.watch(homePageProvider).hasReachedLimit;
+});

@@ -22,19 +22,33 @@ class ProfileHeader extends ConsumerWidget {
                   context.goNamed('home');
                   ref.read(navigationIndexProvider.notifier).state = 0;
                 },
-            child: const Icon(
-              Icons.arrow_back_ios_new,
-              color: Colors.black,
-              size: 18,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new,
+                color: Color(0xFF5D4037),
+                size: 18,
+              ),
             ),
           ),
           const SizedBox(width: 16),
           Text(
             title,
             style: const TextStyle(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
+              color: Color(0xFF5D4037),
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],

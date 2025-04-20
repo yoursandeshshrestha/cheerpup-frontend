@@ -14,52 +14,72 @@ class HomeContent extends ConsumerWidget {
         homeState.messages.where((msg) => !msg.isUserMessage).toList();
     final suggestedActivities = homeState.suggestedActivities;
     final suggestedExercises = homeState.suggestedExercises;
+    final suggestedMusic = homeState.suggestedMusic;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-
-          // Messages section (AI responses only)
-          if (messages.isNotEmpty) ...[
-            _buildMessagesSection(context, messages),
+    // Background color for the content area
+    return Container(
+      decoration: BoxDecoration(color: Colors.grey.shade50),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             const SizedBox(height: 24),
-          ],
 
-          // Suggested activities section (short-term activities)
-          if (suggestedActivities.isNotEmpty) ...[
-            _buildSectionTitle('Suggested Activities'),
-            const SizedBox(height: 8),
-            ...suggestedActivities.map(
-              (activity) => _buildActivityCard(context, activity, ref),
-            ),
-            const SizedBox(height: 24),
-          ],
+            // Messages section (AI responses only)
+            if (messages.isNotEmpty) ...[
+              _buildMessagesSection(context, messages),
+              const SizedBox(height: 28),
+            ],
 
-          // Suggested exercises section (long-term habits)
-          if (suggestedExercises.isNotEmpty) ...[
-            _buildSectionTitle('Suggested Exercises'),
-            const SizedBox(height: 8),
-            ...suggestedExercises.map(
-              (exercise) => _buildExerciseCard(context, exercise, ref),
-            ),
-            const SizedBox(height: 40),
+            // Suggested music section
+            if (suggestedMusic != null) ...[
+              _buildMusicSection(context, suggestedMusic),
+              const SizedBox(height: 28),
+            ],
+
+            // Suggested activities section (short-term activities)
+            if (suggestedActivities.isNotEmpty) ...[
+              _buildSectionTitle(
+                'Suggested Activities',
+                Icons.lightbulb_outline,
+              ),
+              const SizedBox(height: 12),
+              ...suggestedActivities.map(
+                (activity) => _buildActivityCard(context, activity, ref),
+              ),
+              const SizedBox(height: 28),
+            ],
+
+            // Suggested exercises section (long-term habits)
+            if (suggestedExercises.isNotEmpty) ...[
+              _buildSectionTitle('Suggested Exercises', Icons.fitness_center),
+              const SizedBox(height: 12),
+              ...suggestedExercises.map(
+                (exercise) => _buildExerciseCard(context, exercise, ref),
+              ),
+              const SizedBox(height: 40),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF694E3E),
-      ),
+  Widget _buildSectionTitle(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: const Color(0xFF5D4037)),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF5D4037),
+          ),
+        ),
+      ],
     );
   }
 
@@ -67,8 +87,8 @@ class HomeContent extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Responses'),
-        const SizedBox(height: 8),
+        _buildSectionTitle('Responses', Icons.message_outlined),
+        const SizedBox(height: 12),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -81,10 +101,83 @@ class HomeContent extends ConsumerWidget {
     );
   }
 
+  Widget _buildMusicSection(BuildContext context, SuggestedMusic music) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Music For You', Icons.music_note),
+        const SizedBox(height: 12),
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.indigo.shade800, Colors.indigo.shade600],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.indigo.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Container(
+                  height: 60,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.play_circle_filled,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        music.title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Tap to listen",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.open_in_new, color: Colors.white, size: 24),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildMessageBubble(BuildContext context, Message message) {
     // Full width container for AI responses
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -92,13 +185,14 @@ class HomeContent extends ConsumerWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: const Color(0xFFEADDD7), width: 1),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(18.0),
         child:
             message.isPending
                 ? const Center(
@@ -108,7 +202,7 @@ class HomeContent extends ConsumerWidget {
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        Color(0xFF694E3E),
+                        Color(0xFF5D4037),
                       ),
                     ),
                   ),
@@ -116,8 +210,9 @@ class HomeContent extends ConsumerWidget {
                 : Text(
                   message.text,
                   style: const TextStyle(
-                    color: Color(0xFF694E3E),
-                    fontSize: 14,
+                    color: Color(0xFF5D4037),
+                    fontSize: 15,
+                    height: 1.5,
                   ),
                 ),
       ),
@@ -136,37 +231,61 @@ class HomeContent extends ConsumerWidget {
     final description = parts.length > 1 ? parts[1] : '';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: const Color(0xFFEADDD7), width: 1),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(18.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF694E3E),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0E6E0),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.spa,
+                    color: Color(0xFF5D4037),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF5D4037),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.grey.shade700,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -175,7 +294,7 @@ class HomeContent extends ConsumerWidget {
                   context,
                   'Done',
                   Icons.check_circle,
-                  Colors.green,
+                  Colors.green.shade700,
                   () {
                     // Mark as done and remove from list
                     ref
@@ -184,13 +303,13 @@ class HomeContent extends ConsumerWidget {
                     // Could show a success message or add to completed activities
                   },
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 // Cancel button
                 _buildActionButton(
                   context,
                   'Cancel',
                   Icons.close,
-                  Colors.grey,
+                  Colors.grey.shade700,
                   () {
                     // Remove from suggestions
                     ref
@@ -218,37 +337,61 @@ class HomeContent extends ConsumerWidget {
     final description = parts.length > 1 ? parts[1] : '';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: const Color(0xFFEADDD7), width: 1),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(18.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF694E3E),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE3F2FD),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.self_improvement,
+                    color: Color(0xFF1565C0),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1565C0),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.grey.shade700,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -257,7 +400,7 @@ class HomeContent extends ConsumerWidget {
                   context,
                   'Add Habit',
                   Icons.add_circle_outline,
-                  Colors.blue,
+                  Colors.blue.shade700,
                   () {
                     // Add to habits
                     ref
@@ -266,13 +409,13 @@ class HomeContent extends ConsumerWidget {
                     // Could navigate to habits screen or show confirmation
                   },
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 // Ignore button
                 _buildActionButton(
                   context,
                   'Ignore',
                   Icons.not_interested,
-                  Colors.grey,
+                  Colors.grey.shade700,
                   () {
                     // Remove from suggestions
                     ref
@@ -299,7 +442,7 @@ class HomeContent extends ConsumerWidget {
       onTap: onPressed,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           border: Border.all(color: color),
           borderRadius: BorderRadius.circular(20),
@@ -308,11 +451,11 @@ class HomeContent extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 16, color: color),
-            const SizedBox(width: 4),
+            const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 13,
                 color: color,
                 fontWeight: FontWeight.w500,
               ),

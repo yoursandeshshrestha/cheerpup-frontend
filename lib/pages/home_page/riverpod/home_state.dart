@@ -36,6 +36,8 @@ class HomeState {
   final List<String> suggestedExercises;
   final Mood? mood;
   final SuggestedMusic? suggestedMusic;
+  final int messageCount; // Track number of messages sent
+  final bool hasReachedLimit; // Flag to indicate if user has reached the limit
 
   HomeState({
     this.currentUser,
@@ -45,6 +47,8 @@ class HomeState {
     List<String>? suggestedExercises,
     this.mood,
     this.suggestedMusic,
+    this.messageCount = 0,
+    this.hasReachedLimit = false,
   }) : messages = messages ?? [],
        suggestedActivities = suggestedActivities ?? [],
        suggestedExercises = suggestedExercises ?? [];
@@ -58,6 +62,8 @@ class HomeState {
     List<String>? suggestedExercises,
     Mood? mood,
     SuggestedMusic? suggestedMusic,
+    int? messageCount,
+    bool? hasReachedLimit,
   }) {
     return HomeState(
       currentUser: currentUser ?? this.currentUser,
@@ -67,6 +73,8 @@ class HomeState {
       suggestedExercises: suggestedExercises ?? this.suggestedExercises,
       mood: mood ?? this.mood,
       suggestedMusic: suggestedMusic ?? this.suggestedMusic,
+      messageCount: messageCount ?? this.messageCount,
+      hasReachedLimit: hasReachedLimit ?? this.hasReachedLimit,
     );
   }
 }

@@ -1,5 +1,3 @@
-// lib/pages/login/login_page.dart
-
 import 'package:cheerpup/pages/login/riverpod/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +17,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _passwordFocusNode = FocusNode();
 
   bool _isEmail = true;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -31,8 +30,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   void _handleLogin() {
     // Unfocus any active text fields
-    _identifierFocusNode.unfocus();
-    _passwordFocusNode.unfocus();
+    _unfocusAll();
 
     final identifier = _identifierController.text.trim();
     final password = _passwordController.text;
@@ -55,28 +53,24 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         .login(identifier: identifier, password: password);
   }
 
+  void _unfocusAll() {
+    _identifierFocusNode.unfocus();
+    _passwordFocusNode.unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     final loginState = ref.watch(loginProvider);
 
-    print(
-      "Login page build - token: ${loginState.token}, isLoading: ${loginState.isLoading}",
-    );
-
     // If login was successful and we have a token, navigate to home
-    // In login_page.dart
     if (loginState.token != null && !loginState.isLoading) {
-      print("Navigation condition met - redirecting to home");
+      // Use addPostFrameCallback to avoid build-during-build errors
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (mounted) {
-          print("Post-frame callback executing - attempting redirect to home");
           // Add small delay to ensure auth state is updated in GoRouter
-          await Future.delayed(Duration(milliseconds: 150));
+          await Future.delayed(const Duration(milliseconds: 150));
 
-          // Force a NavigatorState.pop and then navigate to home
           if (context.mounted) {
-            print("Executing navigation to home");
-            // Use pushReplacement instead of go for more reliable navigation
             context.go('/');
           }
         }
@@ -84,14 +78,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.grey.shade50, // Match SignupPage background
+      resizeToAvoidBottomInset: true,
       body: GestureDetector(
-        onTap: () {
-          // Unfocus active text fields when tapping outside
-          _identifierFocusNode.unfocus();
-          _passwordFocusNode.unfocus();
-        },
+        onTap: _unfocusAll,
         child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
@@ -100,9 +90,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Container(
                   width: double.infinity,
                   height: 200,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFA9BC7D),
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        const Color(0xFF5D4037), // Dark brown from SignupPage
+                        const Color(0xFF8D6E63), // Lighter brown variant
+                      ],
+                    ),
+                    borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(90),
                       bottomRight: Radius.circular(90),
                     ),
@@ -110,50 +107,71 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   child: Center(
                     child: Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: const Icon(
                         Icons.plus_one,
-                        color: Color(0xFFA9BC7D),
+                        color: Color(0xFF5D4037), // Match header gradient
                         size: 30,
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 40),
-                const Text(
+                Text(
                   'Sign in to Cheerpup',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF4A3728),
+                    color: const Color(0xFF5D4037), // Match SignupPage text
                   ),
                 ),
                 const SizedBox(height: 40),
 
-                // --- Email/Phone ---
+                // --- Form fields ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      // Email/Phone field
+                      Text(
                         'Email/Phone',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF4A3728),
+                          color: const Color(
+                            0xFF5D4037,
+                          ), // Match SignupPage text
                         ),
                       ),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(
+                            16,
+                          ), // Rounder corners like SignupPage
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                           border: Border.all(
-                            color: const Color(0xFFA9BC7D),
+                            color: const Color(
+                              0xFFEADDD7,
+                            ), // Light border from SignupPage
                             width: 1,
                           ),
                         ),
@@ -182,7 +200,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             hintStyle: TextStyle(color: Colors.grey),
                             prefixIcon: Icon(
                               Icons.email_outlined,
-                              color: Color(0xFF4A3728),
+                              color: Color(
+                                0xFF5D4037,
+                              ), // Match SignupPage icons
                             ),
                           ),
                         ),
@@ -190,28 +210,42 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                       const SizedBox(height: 20),
 
-                      const Text(
+                      // Password field
+                      Text(
                         'Password',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF4A3728),
+                          color: const Color(
+                            0xFF5D4037,
+                          ), // Match SignupPage text
                         ),
                       ),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(
+                            16,
+                          ), // Rounder corners like SignupPage
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                           border: Border.all(
-                            color: const Color(0xFFA9BC7D),
+                            color: const Color(
+                              0xFFEADDD7,
+                            ), // Light border from SignupPage
                             width: 1,
                           ),
                         ),
                         child: TextField(
                           controller: _passwordController,
                           focusNode: _passwordFocusNode,
-                          obscureText: true,
+                          obscureText: _obscurePassword,
                           onTapOutside: (_) => _passwordFocusNode.unfocus(),
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(
@@ -223,20 +257,47 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             hintStyle: const TextStyle(color: Colors.grey),
                             prefixIcon: const Icon(
                               Icons.lock_outline,
-                              color: Color(0xFF4A3728),
+                              color: Color(
+                                0xFF5D4037,
+                              ), // Match SignupPage icons
                             ),
                             suffixIcon: IconButton(
-                              icon: const Icon(
-                                Icons.visibility_outlined,
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
                                 color: Colors.grey,
                               ),
                               onPressed: () {
-                                // password visibility toggle (optional)
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
                               },
                             ),
                           ),
                         ),
                       ),
+
+                      const SizedBox(height: 10),
+
+                      // Forgot Password
+                      // Align(
+                      //   alignment: Alignment.centerRight,
+                      //   child: TextButton(
+                      //     onPressed: () {
+                      //       // Handle forgot password
+                      //     },
+                      //     child: Text(
+                      //       'Forgot Password?',
+                      //       style: TextStyle(
+                      //         color: const Color(
+                      //           0xFF1565C0,
+                      //         ), // Blue from SignupPage
+                      //         fontSize: 14,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -252,11 +313,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       width: double.infinity,
                       height: 55,
                       decoration: BoxDecoration(
-                        color:
-                            loginState.isLoading
-                                ? Colors.grey
-                                : const Color(0xFF4A3728),
-                        borderRadius: BorderRadius.circular(50),
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(
+                              0xFF5D4037,
+                            ), // Dark brown from SignupPage
+                            const Color(0xFF8D6E63), // Lighter brown variant
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          16,
+                        ), // Match SignupPage
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF5D4037).withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Center(
                         child:
@@ -269,7 +345,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      'Sign In',
+                                      'Sign in',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 18,
@@ -290,7 +366,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                 const SizedBox(height: 20),
 
-                // Error message
+                // --- Error message ---
                 if (loginState.error != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -300,24 +376,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ),
 
-                const SizedBox(height: 16),
-
-                // --- Sign Up Link ---
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       "Don't have an account? ",
-                      style: TextStyle(color: Color(0xFF4A3728), fontSize: 14),
+                      style: TextStyle(
+                        color: const Color(0xFF5D4037), // Match SignupPage text
+                        fontSize: 14,
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
                         context.replaceNamed('signup');
                       },
-                      child: const Text(
-                        'Sign Up',
+                      child: Text(
+                        'Sign up',
                         style: TextStyle(
-                          color: Color(0xFFFF9500),
+                          color: const Color(
+                            0xFF1565C0,
+                          ), // Blue from SignupPage
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),

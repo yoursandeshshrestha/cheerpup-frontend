@@ -24,17 +24,24 @@ class ProfileDropdownField extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: Color(0xFF5D4037),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.grey.shade300, width: 1),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+            border: Border.all(color: const Color(0xFFEADDD7), width: 1),
           ),
           child: DropdownButtonHideUnderline(
             child: ButtonTheme(
@@ -42,13 +49,17 @@ class ProfileDropdownField extends StatelessWidget {
               child: DropdownButton<String>(
                 value: value,
                 isExpanded: true,
-                icon: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                  child: const Icon(Icons.keyboard_arrow_down),
+                icon: const Padding(
+                  padding: EdgeInsets.only(right: 16),
+                  child: Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Color(0xFF5D4037),
+                  ),
                 ),
-                style: const TextStyle(color: Colors.black87, fontSize: 14),
+                style: const TextStyle(color: Colors.black87, fontSize: 15),
                 dropdownColor: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 onChanged: onChanged,
                 items:
                     items.map<DropdownMenuItem<String>>((String item) {
@@ -56,7 +67,19 @@ class ProfileDropdownField extends StatelessWidget {
                         value: item,
                         child: Row(
                           children: [
-                            Text(item, style: const TextStyle(fontSize: 14)),
+                            Icon(
+                              icon,
+                              color: const Color(0xFF5D4037),
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              item,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Colors.black87,
+                              ),
+                            ),
                           ],
                         ),
                       );
