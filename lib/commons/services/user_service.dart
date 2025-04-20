@@ -1,12 +1,13 @@
 // lib/commons/services/user_service.dart
 
 import 'dart:convert';
+
 import 'package:cheerpup/commons/constants/api_constants.dart';
 import 'package:cheerpup/commons/models/dto/create_user_dto.dart';
 import 'package:cheerpup/commons/models/dto/login_user.dto.dart';
 import 'package:cheerpup/commons/models/dto/update_user_dto.dart';
-import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
 
 class UserService {
   final String _baseUrl = ApiConstants.baseUrl;
@@ -26,7 +27,6 @@ class UserService {
     };
   }
 
-  // Create user (signup)
   Future<Map<String, dynamic>> createUser(CreateUserDto dto) async {
     try {
       final response = await http.post(
@@ -54,7 +54,6 @@ class UserService {
     }
   }
 
-  // Login user
   Future<Map<String, dynamic>> loginUser(LoginUserDto dto) async {
     try {
       final response = await http.post(
@@ -66,7 +65,6 @@ class UserService {
       final responseData = jsonDecode(response.body);
       print("Login response: ${response.statusCode}, data: $responseData");
 
-      // Return success based on HTTP status code from the server
       return {
         'success': response.statusCode == 200,
         'data': responseData,
@@ -119,13 +117,11 @@ class UserService {
     }
   }
 
-  // Update user
   Future<Map<String, dynamic>> updateUser(
     String userId,
     UpdateUserDto dto,
   ) async {
     try {
-      // Check if there are any fields to update
       if (dto.isEmpty) {
         return {'success': false, 'message': 'No fields to update'};
       }
@@ -156,9 +152,6 @@ class UserService {
     }
   }
 
-  // Add this method to your UserService class
-
-  // Upload profile image
   Future<Map<String, dynamic>> uploadProfileImage(
     String userId,
     String imagePath,
